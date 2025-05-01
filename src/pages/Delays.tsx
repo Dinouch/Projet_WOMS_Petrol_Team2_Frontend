@@ -29,7 +29,7 @@ const Delays: React.FC = () => {
 
 
   const data = {
-    labels: ['Progress', 'RPM', 'Pressure'],
+    labels: ['Progress', 'RPM_moy', 'Pressure'],
     datasets: [
       {
         label: 'Valeurs',
@@ -159,7 +159,7 @@ const Delays: React.FC = () => {
           {/* Tendance des problèmes */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-medium mb-4">Tendance des problèmes</h2>
-            <div className="h-[150px]">
+            <div className="h-[250px]">
               <Line data={problemTrend} options={{
                 ...chartOptions,
                 plugins: {
@@ -187,7 +187,7 @@ const Delays: React.FC = () => {
               { title: "Couts", value: "39.76", change: "+3%" },
               { title: "NPT", value: "1.50", change: "+3%" },
             ].map((item, index) => (
-              <div key={index} className="bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center w-32">
+              <div key={index} className="bg-white rounded-xl shadow-sm p-4 flex flex-col items-center justify-center w-60">
                 <h3 className="text-2xl font-bold">{item.value}</h3>
                 <p className="text-gray-500">{item.title}</p>
                 <span className="text-green-500 text-sm">{item.change} ↑</span>
@@ -197,14 +197,14 @@ const Delays: React.FC = () => {
 
 {/* Overall Efficiency */}
 <div className="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center justify-center">
-  <div className="relative w-40 h-20">
+  <div className="relative w-60 h-30">
     <svg className="w-full h-full" viewBox="0 0 200 100">
       {/* Red arc */}
-      <path d="M10,100 A90,90 0 0,1 70,20" fill="none" stroke="#f87171" strokeWidth="16" strokeLinecap="round" />
+      <path d="M10,100 A90,90 0 0,1 70,20" fill="none" stroke="#E60000" strokeWidth="20" strokeLinecap="round" />
       {/* Yellow arc */}
-      <path d="M70,20 A90,90 0 0,1 130,20" fill="none" stroke="#facc15" strokeWidth="16" strokeLinecap="round" />
+      <path d="M70,20 A90,90 0 0,1 130,20" fill="none" stroke="#facc15" strokeWidth="20" strokeLinecap="round" />
       {/* Green arc */}
-      <path d="M130,20 A90,90 0 0,1 190,100" fill="none" stroke="#22c55e" strokeWidth="16" strokeLinecap="round" />
+      <path d="M130,20 A90,90 0 0,1 190,100" fill="none" stroke="#16a34a" strokeWidth="20" strokeLinecap="round" />
       
       {/* Needle */}
       <line x1="100" y1="100" x2="130" y2="40" stroke="#0f172a" strokeWidth="7" strokeLinecap="round" />
