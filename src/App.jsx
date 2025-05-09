@@ -1,16 +1,23 @@
-import React from 'react';
-import DrillingDashboard from './components/DrillingDashboard';
-import DrillingParameters from './components/DrillingParameters';
-import DrillingGeo from './components/DrillingGeo';
-import AccueilIngenieur from './pages/AccueilIngenieur'
-
+import logo from './logo.svg';
+import './App.css';
 
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <main>
-        <AccueilIngenieur />
-      </main>
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.js</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
     </div>
   );
 }
