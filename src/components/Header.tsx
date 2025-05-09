@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Bell, Settings, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const Header: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
+  const navigate = useNavigate();
   
   useEffect(() => {
     const timer = setInterval(() => {
@@ -49,7 +51,13 @@ const Header: React.FC = () => {
         <div className="flex items-center gap-2">
           <span className="font-medium text-orange-500">SR</span>
           <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-            <User size={20} className="text-gray-500" />
+          <button 
+          onClick={() => navigate('/profile')}
+          className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center hover:bg-gray-300 transition-colors cursor-pointer"
+          aria-label="Voir les utilisateurs"
+        >
+          <User size={20} className="text-gray-500" />
+        </button>
           </div>
         </div>
       </div>
