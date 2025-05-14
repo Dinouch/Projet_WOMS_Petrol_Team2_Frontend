@@ -7,12 +7,12 @@ const Sidebar: React.FC = () => {
 
   return (
     <div className="w-[220px] bg-white border-r border-gray-200 h-screen hidden md:flex flex-col transition-all duration-300 shadow-sm">
-      <div className="p-4 border-b border-gray-200">
-        <button className="p-2 rounded-md hover:bg-gray-100">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M3 12H21M3 6H21M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-        </button>
+      <div className="p-4 border-b border-gray-200 flex justify-center">
+        <img 
+          src="../images/esisonatrach.png" 
+       
+          className="h-20 w-40" 
+        />
       </div>
       
       <nav className="flex-1 p-4 space-y-2">

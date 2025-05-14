@@ -14,3 +14,30 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.tab-button {
+  @apply px-4 py-2 text-gray-600 font-medium border-b-2 border-transparent;
+  @apply transition-colors duration-200;
+}
+
+.tab-button:hover {
+  @apply text-orange-500;
+}
+
+.tab-button.active {
+  @apply text-orange-600 border-orange-600;
+}
+
+.tab-content {
+  @apply hidden;
+}
+
+.tab-content.active {
+  @apply block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

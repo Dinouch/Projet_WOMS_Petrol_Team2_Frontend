@@ -1,13 +1,16 @@
 import React, { useState } from "react";
-import { FiCalendar, FiUpload, FiX, FiChevronDown } from "react-icons/fi";
+import { FiCalendar, FiUpload, FiX, FiChevronDown, FiCheck, FiPlus, FiMinus } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import DrillingReportForm from "./upload_manuel";
 
 const ReportPage = () => {
-  // États initiaux vides
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    assurance: "",
+    titre: "",
     ref: "",
     description: "",
-    date: ""
+    date: "",
+    problems: []
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -15,10 +18,22 @@ const ReportPage = () => {
   const [showRefList, setShowRefList] = useState(false);
   const [uploadHover, setUploadHover] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [currentProblem, setCurrentProblem] = useState({
+    type: "",
+    description: "",
+    solution: ""
+  });
+  const [showSolution, setShowSolution] = useState(false);
 
-  // Données dynamiques
   const refOptions = generateRefOptions();
-  const dateOptions = generateDateOptions();
+  const problemTypes = [
+    "Technique",
+    "Logistique",
+    "Sécurité",
+    "Environnement",
+    "Autre"
+  ];
 
   function generateRefOptions() {
     return Array.from({ length: 12 }, (_, i) => {
@@ -42,10 +57,36 @@ const ReportPage = () => {
     return options;
   }
 
-  // Gestionnaires d'événements
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleProblemChange = (e) => {
+    const { name, value } = e.target;
+    setCurrentProblem(prev => ({ ...prev, [name]: value }));
+  };
+
+  const addProblem = () => {
+    if (currentProblem.type && currentProblem.description) {
+      setFormData(prev => ({
+        ...prev,
+        problems: [...prev.problems, currentProblem]
+      }));
+      setCurrentProblem({
+        type: "",
+        description: "",
+        solution: ""
+      });
+      setShowSolution(false);
+    }
+  };
+
+  const removeProblem = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      problems: prev.problems.filter((_, i) => i !== index)
+    }));
   };
 
   const handleDateSelect = (dateStr) => {
@@ -82,11 +123,20 @@ const ReportPage = () => {
     });
   };
 
-  // Styles constants
-  const inputClass = "w-full bg-gray-50 rounded-lg px-4 py-3 border border-orange-300 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent text-gray-700";
-  const buttonClass = "px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors";
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    console.log("Form submitted:", { ...formData, files });
+    setShowSuccess(true);
+    setTimeout(() => {
+      navigate('/acceuil');
+    }, 3000);
+  };
 
-  // Render Date Picker
+  // Nouveaux styles plus sobres
+  const inputClass = "w-full bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-700 transition-colors";
+  const buttonClass = "px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors shadow-sm";
+  const sectionTitleClass = "text-lg font-semibold mb-3 text-gray-800 border-l-4 border-orange-500 pl-3";
+
   const renderDatePicker = () => {
     const year = currentMonth.getFullYear();
     const month = currentMonth.getMonth();
@@ -94,25 +144,25 @@ const ReportPage = () => {
     const firstDay = new Date(year, month, 1).getDay();
 
     return (
-      <div className="absolute z-10 mt-1 w-64 bg-white border border-orange-300 rounded-lg shadow-lg p-3">
+      <div className="absolute z-10 mt-1 w-64 bg-white border border-gray-200 rounded-lg shadow-lg p-3">
         <div className="flex justify-between items-center mb-2">
           <button 
             onClick={() => navigateMonth('prev')}
-            className="p-1 text-orange-600 hover:bg-orange-50 rounded"
+            className="p-1 text-gray-600 hover:bg-gray-100 rounded"
           >
             &lt;
           </button>
-          <span className="font-medium text-orange-700">
+          <span className="font-medium text-gray-700">
             {currentMonth.toLocaleString('fr-FR', { month: 'long', year: 'numeric' })}
           </span>
           <button 
             onClick={() => navigateMonth('next')}
-            className="p-1 text-orange-600 hover:bg-orange-50 rounded"
+            className="p-1 text-gray-600 hover:bg-gray-100 rounded"
           >
             &gt;
           </button>
         </div>
-        <div className="grid grid-cols-7 gap-1 text-xs text-center mb-2 text-orange-600">
+        <div className="grid grid-cols-7 gap-1 text-xs text-center mb-2 text-gray-500">
           {['Di', 'Lu', 'Ma', 'Me', 'Je', 'Ve', 'Sa'].map(day => (
             <div key={day} className="py-1">{day}</div>
           ))}
@@ -130,8 +180,8 @@ const ReportPage = () => {
               <button
                 key={day}
                 onClick={() => handleDateSelect(dateStr)}
-                className={`h-8 w-8 flex items-center justify-center rounded-full mx-auto ${
-                  isSelected ? "bg-orange-500 text-white" : "hover:bg-orange-100 text-orange-700"
+                className={`h-8 w-8 flex items-center justify-center rounded-full mx-auto text-sm ${
+                  isSelected ? "bg-orange-500 text-white" : "hover:bg-gray-100 text-gray-700"
                 }`}
               >
                 {day}
@@ -144,157 +194,278 @@ const ReportPage = () => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-sm">
-      {/* Titre fixe orange */}
-      <h1 className="text-2xl font-bold  mb-6 border-b-2 border-orange-500 pb-2">
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
+      {showSuccess && (
+        <div className="fixed top-4 right-4 z-50">
+          <div className="bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg flex items-center animate-fade-in">
+            <FiCheck className="mr-2" size={20} />
+            <span>Rapport envoyé avec succès! Redirection en cours...</span>
+          </div>
+        </div>
+      )}
+
+      <h1 className="text-2xl font-bold mb-6 text-gray-800 pb-2 border-b border-gray-200">
         Titre du rapport
       </h1>
 
-      {/* Assurance */}
-      <div className="mb-6">
-        <input
-          type="text"
-          name="assurance"
-          value={formData.assurance}
-          onChange={handleInputChange}
-          placeholder="Est-il d'assurancement du pull Admir / negar"
-          className={inputClass}
-        />
-      </div>
-
-      {/* Ref de puit - Liste déroulante orange */}
-      <div className="mb-6 relative">
-        <h2 className="text-lg font-semibold mb-2">Ref de puit</h2>
-        <div className="relative">
+      <form onSubmit={handleSubmit}>
+        {/* Assurance */}
+        <div className="mb-6">
+          <label className="block text-gray-700 mb-2">Titre Du Rapport</label>
           <input
             type="text"
-            value={formData.ref}
-            readOnly
-            onClick={() => setShowRefList(!showRefList)}
-            placeholder="Sélectionnez une référence"
-            className={`${inputClass} cursor-pointer pr-10`}
+            name="assurance"
+            value={formData.assurance}
+            onChange={handleInputChange}
+            placeholder="Entrez le titre de votre rapport"
+            className={inputClass}
+            required
           />
-          <FiChevronDown 
-            className={`absolute right-3 top-3.5 text-orange-500 transition-transform ${
-              showRefList ? "rotate-180" : ""
-            }`}
-            size={20}
+        </div>
+
+        {/* Ref de puit */}
+        <div className="mb-6 relative">
+          <label className={sectionTitleClass}>Ref de puit</label>
+          <div className="relative">
+            <input
+              type="text"
+              value={formData.ref}
+              readOnly
+              onClick={() => setShowRefList(!showRefList)}
+              placeholder="Sélectionnez une référence"
+              className={`${inputClass} cursor-pointer pr-10`}
+              required
+            />
+            <FiChevronDown 
+              className={`absolute right-3 top-3 text-gray-500 transition-transform ${
+                showRefList ? "rotate-180" : ""
+              }`}
+              size={18}
+            />
+            {showRefList && (
+              <div className="absolute z-10 mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+                {refOptions.map((option, i) => (
+                  <div
+                    key={i}
+                    className={`px-4 py-2 hover:bg-gray-50 cursor-pointer ${
+                      formData.ref === option ? "bg-orange-50 text-orange-600" : "text-gray-700"
+                    }`}
+                    onClick={() => selectRef(option)}
+                  >
+                    {option}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Description */}
+        <div className="mb-6">
+          <label className={sectionTitleClass}>Description</label>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleInputChange}
+            placeholder="À cette option la en va terminer 5-7x au max mais vaut mieux consulter..."
+            className={`${inputClass} h-32`}
+            required
           />
-          {showRefList && (
-            <div className="absolute z-10 mt-1 w-full bg-white border border-orange-300 rounded-lg shadow-lg max-h-60 overflow-auto">
-              {refOptions.map((option, i) => (
-                <div
-                  key={i}
-                  className={`px-4 py-2 hover:bg-orange-50 cursor-pointer ${
-                    formData.ref === option ? "bg-orange-100" : ""
-                  }`}
-                  onClick={() => selectRef(option)}
-                >
-                  {option}
+        </div>
+
+        {/* Date */}
+        <div className="mb-6 relative">
+          <label className={sectionTitleClass}>Date</label>
+          <div className="relative">
+            <input
+              type="text"
+              value={formData.date}
+              readOnly
+              onClick={() => setShowDatePicker(!showDatePicker)}
+              placeholder="JJ/MM/AAAA"
+              className={`${inputClass} cursor-pointer pr-10`}
+              required
+            />
+            <FiCalendar 
+              className="absolute right-3 top-3 text-gray-500"
+              size={18}
+            />
+            {showDatePicker && renderDatePicker()}
+          </div>
+        </div>
+
+        {/* Problèmes rencontrés */}
+        <div className="mb-6">
+          <label className={sectionTitleClass}>Problèmes rencontrés</label>
+          
+          {formData.problems.map((problem, index) => (
+            <div key={index} className="mb-3 p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-medium text-gray-800">{problem.type}</p>
+                  <p className="text-gray-600 mt-1 text-sm">{problem.description}</p>
+                  {problem.solution && (
+                    <div className="mt-2">
+                      <p className="font-medium text-green-600 text-sm">Solution proposée:</p>
+                      <p className="text-gray-600 text-sm">{problem.solution}</p>
+                    </div>
+                  )}
                 </div>
-              ))}
+                <button
+                  type="button"
+                  onClick={() => removeProblem(index)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <FiX size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+
+          {/* Formulaire pour ajouter un problème */}
+          <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+            <h3 className="font-medium text-gray-700 mb-3">Ajouter un problème</h3>
+            
+            <div className="mb-3">
+              <label className="block text-gray-700 mb-1 text-sm">Type de problème</label>
+              <select
+                name="type"
+                value={currentProblem.type}
+                onChange={handleProblemChange}
+                className={`${inputClass} text-sm py-2`}
+              >
+                <option value="">Sélectionnez un type</option>
+                {problemTypes.map((type, i) => (
+                  <option key={i} value={type}>{type}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="mb-3">
+              <label className="block text-gray-700 mb-1 text-sm">Description</label>
+              <textarea
+                name="description"
+                value={currentProblem.description}
+                onChange={handleProblemChange}
+                className={`${inputClass} h-20 text-sm`}
+                placeholder="Décrivez le problème rencontré..."
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowSolution(!showSolution)}
+              className="flex items-center text-orange-600 mb-3 text-sm"
+            >
+              {showSolution ? <FiMinus className="mr-1" size={14} /> : <FiPlus className="mr-1" size={14} />}
+              {showSolution ? "Masquer la solution" : "Ajouter une solution"}
+            </button>
+
+            {showSolution && (
+              <div className="mb-3">
+                <label className="block text-gray-700 mb-1 text-sm">Solution proposée</label>
+                <textarea
+                  name="solution"
+                  value={currentProblem.solution}
+                  onChange={handleProblemChange}
+                  className={`${inputClass} h-20 text-sm`}
+                  placeholder="Décrivez la solution proposée..."
+                />
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={addProblem}
+              className={`${buttonClass} flex items-center text-sm px-3 py-1.5`}
+              disabled={!currentProblem.type || !currentProblem.description}
+            >
+              <FiPlus className="mr-1" size={14} />
+              Ajouter le problème
+            </button>
+          </div>
+        </div>
+
+        {/* Upload de fichiers */}
+        <div className="mb-6">
+          <label className={sectionTitleClass}>Upload Projects</label>
+          <p className="text-gray-600 mb-4 text-sm">
+            Pieuse upload files in pdf, docx or doc format and make sure the file size is under 2.5 MB.
+          </p>
+
+          <hr className="border-gray-200 my-4" />
+
+          {files.length === 0 ? (
+            <div 
+              className={`text-center py-12 border-2 border-dashed rounded-lg transition-all ${
+                uploadHover ? "border-orange-300 bg-orange-50" : "border-gray-300 bg-gray-50"
+              }`}
+              onDragOver={(e) => e.preventDefault()}
+              onDragEnter={() => setUploadHover(true)}
+              onDragLeave={() => setUploadHover(false)}
+              onDrop={handleFileDrop}
+            >
+              <FiUpload className="mx-auto text-orange-400 mb-3" size={24} />
+              <p className="font-medium text-gray-600 mb-3">No files Uploaded yet!</p>
+              <label className={`${buttonClass} inline-flex items-center px-5 py-1.5 text-sm cursor-pointer`}>
+                <FiUpload className="mr-1" size={14} />
+                Upload
+                <input
+                  type="file"
+                  className="hidden"
+                  multiple
+                  accept=".pdf,.docx,.doc,.xlsx"
+                  onChange={handleFileUpload}
+                />
+              </label>
+              <p className="text-xs text-gray-500 mt-3">
+                Format: pdf, docx, doc & Max file size: 2.8 MB
+              </p>
+            </div>
+          ) : (
+            <div className="border border-gray-200 rounded-lg p-4 bg-gray-50">
+              <ul className="mb-4">
+                {files.map((file, i) => (
+                  <li key={i} className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0">
+                    <span className="text-gray-700 text-sm truncate max-w-xs">{file.name}</span>
+                    <button
+                      type="button"
+                      onClick={() => removeFile(i)}
+                      className="text-gray-500 hover:text-gray-700"
+                    >
+                      <FiX size={16} />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+              <div className="flex justify-end space-x-3">
+                <button 
+                  type="button"
+                  onClick={() => setFiles([])}
+                  className="px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 text-sm"
+                >
+                  Cancel
+                </button>
+                <button type="button" className={`${buttonClass} px-4 py-1.5 text-sm`}>
+                  Done
+                </button>
+              </div>
             </div>
           )}
         </div>
-      </div>
 
-      {/* Description */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold  mb-2">Description:</h2>
-        <textarea
-          name="description"
-          value={formData.description}
-          onChange={handleInputChange}
-          placeholder="À cette option la en va terminer 5-7x au max mais vaut mieux consulter..."
-          className={`${inputClass} h-32`}
-        />
-      </div>
-
-      {/* Date avec picker orange */}
-      <div className="mb-6 relative">
-        <h2 className="text-lg font-semibold  mb-2">Date:</h2>
-        <div className="relative">
-          <input
-            type="text"
-            value={formData.date}
-            readOnly
-            onClick={() => setShowDatePicker(!showDatePicker)}
-            placeholder="JJ/MM/AAAA"
-            className={`${inputClass} cursor-pointer pr-10`}
-          />
-          <FiCalendar 
-            className="absolute right-3 top-3.5 text-orange-500"
-            size={20}
-          />
-          {showDatePicker && renderDatePicker()}
-        </div>
-      </div>
-
-      {/* Upload Projects - Style orange identique */}
-      <div className="mb-6">
-        <h2 className="text-lg font-semibold  mb-2">Upload Projects</h2>
-        <p className="text-gray-600 mb-4">
-          Pieuse upload files in pdf, docx or doc format and make sure the file size is under 2.5 MB.
-        </p>
-
-        <hr className="border-orange-200 my-4" />
-
-        {files.length === 0 ? (
-          <div 
-            className={`text-center py-12 border-2 border-dashed rounded-lg transition-all ${
-              uploadHover ? "border-orange-400 bg-orange-50" : "border-orange-300 bg-orange-50"
-            }`}
-            onDragOver={(e) => e.preventDefault()}
-            onDragEnter={() => setUploadHover(true)}
-            onDragLeave={() => setUploadHover(false)}
-            onDrop={handleFileDrop}
+        {/* Bouton de soumission */}
+        <div className="flex justify-end mt-8 pt-4 border-t border-gray-200">
+          <button
+            type="submit"
+            className={`${buttonClass} px-6 py-2.5 text-sm font-medium flex items-center`}
+            disabled={showSuccess}
           >
-            <FiUpload className="mx-auto text-orange-400 mb-3" size={24} />
-            <p className="font-medium text-orange-500 mb-3">No files Uploaded yet!</p>
-            <label className={`${buttonClass} inline-flex items-center px-6 py-2 cursor-pointer`}>
-              <FiUpload className="mr-2" />
-              Upload
-              <input
-                type="file"
-                className="hidden"
-                multiple
-                accept=".pdf,.docx,.doc"
-                onChange={handleFileUpload}
-              />
-            </label>
-            <p className="text-xs text-orange-500 mt-3">
-              Format: pdf, docx, doc & Max file size: 2.8 MB
-            </p>
-          </div>
-        ) : (
-          <div className="border border-orange-300 rounded-lg p-4 bg-orange-50">
-            <ul className="mb-4">
-              {files.map((file, i) => (
-                <li key={i} className="flex items-center justify-between py-2 border-b border-orange-200 last:border-b-0">
-                  <span className="text-orange-800 truncate max-w-xs">{file.name}</span>
-                  <button
-                    onClick={() => removeFile(i)}
-                    className="text-orange-500 hover:text-orange-700"
-                  >
-                    <FiX size={18} />
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <div className="flex justify-end space-x-3">
-              <button 
-                onClick={() => setFiles([])}
-                className="px-4 py-2 border border-orange-300 text-orange-600 rounded-lg hover:bg-orange-100"
-              >
-                Cancel
-              </button>
-              <button className={`${buttonClass} px-6`}>
-                Done
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
+            <FiUpload className="mr-2" size={16} />
+            Envoyer le rapport
+          </button>
+        </div>
+      </form>
     </div>
   );
 };
