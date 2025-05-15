@@ -1,120 +1,536 @@
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { CheckCircle, AlertCircle, Clock, ChevronRight, HardHat, Drill, Droplet, Layers } from 'lucide-react';
+import {
+  LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  Tooltip, Legend, ResponsiveContainer, AreaChart, Area,
+  ComposedChart, Cell, PieChart, Pie, RadarChart, PolarGrid, 
+  PolarAngleAxis, PolarRadiusAxis, Radar
+} from 'recharts';
 
-// Données simulées pour les paramètres de forage
-const drillingParamsData = [
-  { depth: 50, wob: 10, rpm: 120, flow: 600, pressure: 1500, hsi: 2.4 },
-  { depth: 100, wob: 12, rpm: 110, flow: 650, pressure: 1600, hsi: 2.6 },
-  { depth: 150, wob: 15, rpm: 100, flow: 700, pressure: 1700, hsi: 3.0 },
-  { depth: 200, wob: 18, rpm: 90, flow: 750, pressure: 1800, hsi: 3.4 },
-  { depth: 250, wob: 20, rpm: 80, flow: 800, pressure: 1900, hsi: 3.8 },
-  { depth: 300, wob: 22, rpm: 70, flow: 850, pressure: 2000, hsi: 4.2 }
+// Couleurs modernes
+const colors = {
+  primary: '#3b82f6',
+  secondary: '#10b981',
+  danger: '#ef4444',
+  warning: '#f59e0b',
+  dark: '#1e293b',
+  light: '#f8fafc'
+};
+
+// Données simulées
+const bitData = {
+  current: {
+    metrics: {
+      hoursUsed: 42,
+      metresDrilled: 125,
+      efficiency: 0.87,
+      weightOnBit: 12,
+      rpm: 120
+    },
+    components: [
+      { name: 'MWD', hours: 120, alertThreshold: 200 },
+      { name: 'Motor', hours: 180, alertThreshold: 200 },
+      { name: 'Stabilizer', hours: 90, alertThreshold: 150 },
+      { name: 'Bit', hours: 42, alertThreshold: 60 }
+    ]
+  }
+};
+
+// Données simulées pour les graphiques
+const mudWeightData = [
+  { depth: 0, weight: 1.1 },
+  { depth: 500, weight: 1.2 },
+  { depth: 1000, weight: 1.3 },
+  { depth: 1500, weight: 1.25 },
+  { depth: 2000, weight: 1.4 },
+  { depth: 2500, weight: 1.45 },
+  { depth: 3000, weight: 1.5 },
 ];
 
-function DrillingParameters() {
-  // Valeurs actuelles pour les jauges
-  const currentWOB = 22;
-  const maxWOB = 30;
-  const currentRPM = 70;
-  const maxRPM = 150;
-  const currentFlow = 850;
-  const maxFlow = 1000;
-  const currentPressure = 2000;
-  const maxPressure = 2500;
-  const currentHSI = 4.2;
-  
+const circulationLossData = [
+  { date: '01/04', surface: 5, subsurface: 2 },
+  { date: '02/04', surface: 3, subsurface: 1 },
+  { date: '03/04', surface: 7, subsurface: 3 },
+  { date: '04/04', surface: 2, subsurface: 0 },
+  { date: '05/04', surface: 4, subsurface: 5 },
+  { date: '06/04', surface: 8, subsurface: 2 },
+  { date: '07/04', surface: 6, subsurface: 1 },
+];
+
+const inclinationData = [
+  { depth: 0, angle: 0 },
+  { depth: 500, angle: 2 },
+  { depth: 1000, angle: 5 },
+  { depth: 1500, angle: 12 },
+  { depth: 2000, angle: 18 },
+  { depth: 2500, angle: 23 },
+  { depth: 3000, angle: 30 },
+];
+
+const geologyData = [
+  { depth: 500, formation: 'Argile', rop: 12 },
+  { depth: 1000, formation: 'Calcaire', rop: 8 },
+  { depth: 1500, formation: 'Grès', rop: 15 },
+  { depth: 2000, formation: 'Schiste', rop: 6 },
+  { depth: 2500, formation: 'Dolomite', rop: 9 },
+];
+
+const ropByFormationData = [
+  { formation: 'Argile', rop: 12 },
+  { formation: 'Calcaire', rop: 8 },
+  { formation: 'Grès', rop: 15 },
+  { formation: 'Schiste', rop: 6 },
+  { formation: 'Dolomite', rop: 9 },
+];
+
+const pumpPerformanceData = [
+  { time: '08:00', debit: 600, pressure: 180 },
+  { time: '09:00', debit: 620, pressure: 185 },
+  { time: '10:00', debit: 640, pressure: 195 },
+  { time: '11:00', debit: 600, pressure: 190 },
+  { time: '12:00', debit: 590, pressure: 185 },
+  { time: '13:00', debit: 610, pressure: 190 },
+  { time: '14:00', debit: 630, pressure: 200 },
+];
+
+const mudPropertiesData = [
+  { time: '08:00', ph: 8.5, viscosity: 45 },
+  { time: '09:00', ph: 8.6, viscosity: 46 },
+  { time: '10:00', ph: 8.7, viscosity: 48 },
+  { time: '11:00', ph: 8.5, viscosity: 47 },
+  { time: '12:00', ph: 8.4, viscosity: 46 },
+  { time: '13:00', ph: 8.6, viscosity: 45 },
+  { time: '14:00', ph: 8.7, viscosity: 47 },
+];
+
+// Couleurs pour les formations géologiques
+const formationColors = {
+  'Argile': '#8884d8',
+  'Calcaire': '#82ca9d',
+  'Grès': '#ffc658',
+  'Schiste': '#ff8042',
+  'Dolomite': '#0088fe'
+};
+
+// Composant de carte moderne
+const ModernCard = ({ title, value, icon, trend, unit, className = '' }) => (
+  <div className={`bg-white rounded-xl p-4 shadow-sm border border-gray-100 ${className}`}>
+    <div className="flex justify-between items-start">
+      <div>
+        <p className="text-sm font-medium text-gray-500">{title}</p>
+        <div className="flex items-end mt-2">
+          <p className="text-2xl font-bold text-gray-800">{value}</p>
+          {unit && <span className="text-sm text-gray-500 ml-1 mb-1">{unit}</span>}
+        </div>
+      </div>
+      <div className={`p-2 rounded-lg ${icon ? 'bg-blue-50 text-blue-600' : ''}`}>
+        {icon}
+      </div>
+    </div>
+    {trend && (
+      <div className={`flex items-center mt-2 text-sm ${trend.value > 0 ? 'text-green-500' : 'text-red-500'}`}>
+        {trend.value > 0 ? (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+          </svg>
+        ) : (
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        )}
+        <span className="ml-1">{trend.value}% vs hier</span>
+      </div>
+    )}
+  </div>
+);
+
+// Composant de barre de progression
+const ProgressBar = ({ value, max, color = 'primary' }) => {
+  const percentage = Math.min(100, (value / max) * 100);
+  const colorClasses = {
+    primary: 'bg-blue-500',
+    secondary: 'bg-green-500',
+    danger: 'bg-red-500',
+    warning: 'bg-yellow-500'
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-      <h2 className="text-xl font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">
-        Paramètres de Forage et Optimisation
-      </h2>
+    <div className="w-full bg-gray-200 rounded-full h-2">
+      <div 
+        className={`h-2 rounded-full ${colorClasses[color]}`} 
+        style={{ width: `${percentage}%` }}
+      ></div>
+    </div>
+  );
+};
+
+function BitBhaTracking() {
+  // Fonction pour déterminer le statut d'un composant basé sur ses heures d'utilisation
+  const getComponentStatus = (hours, threshold) => {
+    if (hours >= threshold) return 'alert';
+    if (hours >= threshold * 0.8) return 'warning';
+    return 'normal';
+  };
+
+  // Fonction pour obtenir la couleur selon le statut
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 'alert': return 'text-red-500';
+      case 'warning': return 'text-amber-500';
+      default: return 'text-green-500';
+    }
+  };
+
+  // Fonction pour obtenir l'icône selon le statut
+  const getStatusIcon = (status) => {
+    switch (status) {
+      case 'alert': return <AlertCircle className={`${getStatusColor(status)}`} size={20} />;
+      case 'warning': return <Clock className={`${getStatusColor(status)}`} size={20} />;
+      default: return <CheckCircle className={`${getStatusColor(status)}`} size={20} />;
+    }
+  };
+
+  // Préparer des données pour le diagramme de progression géologique
+  const prepareGeologyData = () => {
+    const result = [];
+    let prevDepth = 0;
+    
+    geologyData.forEach((item) => {
+      result.push({
+        name: `${prevDepth}m - ${item.depth}m`,
+        depth: item.depth - prevDepth,
+        formation: item.formation
+      });
+      prevDepth = item.depth;
+    });
+    
+    return result;
+  };
+
+  return (
+    <div className="bg-gray-50 p-6">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">Suivi du forage</h1>
+          <p className="text-gray-500">Dernière mise à jour: {new Date().toLocaleString()}</p>
+        </div>
+        <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          Exporter le rapport <ChevronRight className="ml-2" size={16} />
+        </button>
+      </div>
       
-      <div className="grid grid-cols-2 gap-6">
-        <div className="space-y-4">
-          {/* WOB Gauge */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-gray-600 mb-3">WOB (Weight on Bit)</h3>
-            <div className="mt-2">
-              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-orange-500 rounded-full" 
-                  style={{ width: `${(currentWOB / maxWOB) * 100}%` }}
-                ></div>
-              </div>
-              <div className="flex justify-end mt-1">
-                <span className="text-sm font-medium text-gray-700">{currentWOB} tonnes</span>
-              </div>
+      {/* KPI Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+        <ModernCard 
+          title="Métrage foré" 
+          value={bitData.current.metrics.metresDrilled} 
+          unit="m" 
+          icon={<Drill className="w-5 h-5" />}
+          trend={{ value: 2.5 }}
+        />
+        <ModernCard 
+          title="Heures d'utilisation" 
+          value={bitData.current.metrics.hoursUsed} 
+          unit="h" 
+          icon={<Clock className="w-5 h-5" />}
+        />
+        <ModernCard 
+          title="Efficacité" 
+          value={Math.round(bitData.current.metrics.efficiency * 100)} 
+          unit="%" 
+          icon={<CheckCircle className="w-5 h-5" />}
+        />
+        <ModernCard 
+          title="Poids sur trépan" 
+          value={bitData.current.metrics.weightOnBit} 
+          unit="t" 
+          icon={<HardHat className="w-5 h-5" />}
+        />
+        <ModernCard 
+          title="RPM" 
+          value={bitData.current.metrics.rpm} 
+          icon={<svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>}
+        />
+      </div>
+      
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Performance du trépan */}
+        <div className="bg-white rounded-xl shadow-sm p-6 lg:col-span-2">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Performance du trépan</h2>
+            <div className="flex space-x-2">
+              <button className="px-3 py-1 text-sm bg-blue-50 text-blue-600 rounded-lg">Journalier</button>
+              <button className="px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-lg">Hebdomadaire</button>
             </div>
           </div>
           
-          {/* RPM Gauge */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-gray-600 mb-3">RPM</h3>
-            <div className="mt-2">
-              <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-orange-500 rounded-full" 
-                  style={{ width: `${(currentRPM / maxRPM) * 100}%` }}
-                ></div>
+          <div className="grid grid-cols-3 gap-4 mb-6">
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Progression</p>
+              <ProgressBar value={bitData.current.metrics.hoursUsed} max={60} color="warning" />
+              <p className="text-xs text-gray-500 mt-1">{bitData.current.metrics.hoursUsed}h sur 60h</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">État</p>
+              <div className="flex items-center">
+                <span className={`inline-block w-2 h-2 rounded-full mr-2 ${bitData.current.metrics.hoursUsed > 50 ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                <span className="text-sm">{bitData.current.metrics.hoursUsed > 50 ? 'À remplacer' : 'Bon état'}</span>
               </div>
-              <div className="flex justify-end mt-1">
-                <span className="text-sm font-medium text-gray-700">{currentRPM} rpm</span>
-              </div>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500 mb-1">Vitesse moyenne</p>
+              <p className="text-lg font-semibold">{(bitData.current.metrics.metresDrilled / bitData.current.metrics.hoursUsed).toFixed(2)} m/h</p>
             </div>
           </div>
           
-          {/* Flow & Pressure */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-gray-600 mb-3">Flow & Pressure</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-blue-500 rounded-full" 
-                    style={{ width: `${(currentFlow / maxFlow) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-end mt-1">
-                  <span className="text-sm font-medium text-gray-700">{currentFlow} gpm</span>
-                </div>
-              </div>
-              <div>
-                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-blue-500 rounded-full" 
-                    style={{ width: `${(currentPressure / maxPressure) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="flex justify-end mt-1">
-                  <span className="text-sm font-medium text-gray-700">{currentPressure} psi</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* HSI Indicator */}
-          <div className="bg-gray-50 rounded-lg p-4">
-            <h3 className="text-gray-600 mb-3">HSI</h3>
-            <div className="bg-green-600 text-white rounded p-4 flex items-center justify-center">
-              <span className="text-xl font-bold">{currentHSI}</span>
-            </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <ComposedChart
+                data={pumpPerformanceData}
+                margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="time" tick={{ fill: '#6b7280' }} />
+                <YAxis yAxisId="left" tick={{ fill: '#6b7280' }} />
+                <YAxis yAxisId="right" orientation="right" tick={{ fill: '#6b7280' }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Legend />
+                <Bar yAxisId="left" dataKey="debit" name="Débit (l/min)" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                <Line yAxisId="right" type="monotone" dataKey="pressure" name="Pression (bar)" stroke="#10b981" strokeWidth={2} dot={{ r: 4 }} />
+              </ComposedChart>
+            </ResponsiveContainer>
           </div>
         </div>
         
-        {/* Parameters-ROP Correlation */}
-        <div className="bg-gray-50 rounded-lg p-4">
-          <h3 className="text-gray-600 text-center mb-4">Corrélation paramètres-ROP</h3>
+        {/* État des composants */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">État des composants BHA</h2>
+          <div className="space-y-4">
+            {bitData.current.components.map((component, index) => {
+              const status = getComponentStatus(component.hours, component.alertThreshold);
+              const percentage = Math.round((component.hours / component.alertThreshold) * 100);
+              
+              return (
+                <div key={index} className="p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center">
+                      <span className={`inline-block w-2 h-2 rounded-full mr-2 ${
+                        status === 'alert' ? 'bg-red-500' : status === 'warning' ? 'bg-yellow-500' : 'bg-green-500'
+                      }`}></span>
+                      <span className="font-medium">{component.name}</span>
+                    </div>
+                    <span className={`text-sm font-medium ${
+                      status === 'alert' ? 'text-red-500' : status === 'warning' ? 'text-yellow-500' : 'text-green-500'
+                    }`}>{percentage}%</span>
+                  </div>
+                  <ProgressBar 
+                    value={component.hours} 
+                    max={component.alertThreshold} 
+                    color={status === 'alert' ? 'danger' : status === 'warning' ? 'warning' : 'primary'}
+                  />
+                  <div className="flex justify-between text-xs text-gray-500 mt-1">
+                    <span>{component.hours}h utilisées</span>
+                    <span>Limite: {component.alertThreshold}h</span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+      
+      {/* Graphiques secondaires */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        {/* Poids de la boue */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Poids de la boue</h2>
+            <Droplet className="text-blue-500" size={20} />
+          </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={drillingParamsData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="depth" label={{ value: 'Profondeur (m)', position: 'insideBottom', offset: -5 }} />
-                <YAxis yAxisId="left" orientation="left" stroke="#ff6b35" />
-                <YAxis yAxisId="right" orientation="right" stroke="#33a1fd" />
-                <Tooltip />
+              <LineChart
+                data={mudWeightData}
+                margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="depth" tick={{ fill: '#6b7280' }} />
+                <YAxis tick={{ fill: '#6b7280' }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
                 <Legend />
-                <Line yAxisId="left" type="monotone" dataKey="wob" stroke="#ff6b35" activeDot={{ r: 8 }} />
-                <Line yAxisId="right" type="monotone" dataKey="rpm" stroke="#33a1fd" />
+                <Line 
+                  type="monotone" 
+                  dataKey="weight" 
+                  name="Poids (sg)" 
+                  stroke="#3b82f6" 
+                  strokeWidth={2} 
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#ffffff' }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Progression géologique */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-lg font-semibold text-gray-800">Progression géologique</h2>
+            <Layers className="text-blue-500" size={20} />
+          </div>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                layout="vertical"
+                data={prepareGeologyData()}
+                margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis type="number" tick={{ fill: '#6b7280' }} />
+                <YAxis dataKey="name" type="category" tick={{ fill: '#6b7280' }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Legend />
+                <Bar dataKey="depth" name="Formation">
+                  {prepareGeologyData().map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={formationColors[entry.formation]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+      
+      {/* Dernière ligne de graphiques */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* ROP par formation */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">ROP par formation</h2>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={ropByFormationData}
+                margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="formation" tick={{ fill: '#6b7280' }} />
+                <YAxis tick={{ fill: '#6b7280' }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Legend />
+                <Bar dataKey="rop" name="Vitesse de forage (m/h)" radius={[4, 4, 0, 0]}>
+                  {ropByFormationData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={formationColors[entry.formation]} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Pertes de circulation */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Pertes de circulation</h2>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart
+                data={circulationLossData}
+                margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="date" tick={{ fill: '#6b7280' }} />
+                <YAxis tick={{ fill: '#6b7280' }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Legend />
+                <Area 
+                  type="monotone" 
+                  dataKey="surface" 
+                  name="Pertes en surface (m³)" 
+                  stroke="#3b82f6" 
+                  fill="#93c5fd" 
+                  fillOpacity={0.8}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="subsurface" 
+                  name="Pertes S.C.E. (m³)" 
+                  stroke="#10b981" 
+                  fill="#a7f3d0" 
+                  fillOpacity={0.8}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+        
+        {/* Inclinaison */}
+        <div className="bg-white rounded-xl shadow-sm p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Inclinaison vs profondeur</h2>
+          <div className="h-64">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart
+                data={inclinationData}
+                margin={{ top: 20, right: 20, left: 20, bottom: 20 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="depth" tick={{ fill: '#6b7280' }} />
+                <YAxis tick={{ fill: '#6b7280' }} />
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#ffffff',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '0.5rem',
+                    boxShadow: '0 1px 3px rgba(0,0,0,0.1)'
+                  }}
+                />
+                <Legend />
+                <Line 
+                  type="monotone" 
+                  dataKey="angle" 
+                  name="Inclinaison (°)" 
+                  stroke="#f59e0b" 
+                  strokeWidth={2} 
+                  dot={{ r: 4 }}
+                  activeDot={{ r: 6, stroke: '#f59e0b', strokeWidth: 2, fill: '#ffffff' }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -124,4 +540,4 @@ function DrillingParameters() {
   );
 }
 
-export default DrillingParameters;
+export default BitBhaTracking;

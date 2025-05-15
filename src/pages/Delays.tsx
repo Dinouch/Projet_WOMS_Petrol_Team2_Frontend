@@ -212,13 +212,13 @@ const Delays: React.FC = () => {
       <circle cx="100" cy="100" r="6" fill="#0f172a" />
     </svg>
   </div>
-  <h2 className="text-lg font-medium mt-4 text-slate-900">Overall Efficiency</h2>
+  <h2 className="text-lg font-medium mt-4 text-slate-900">Efficacité globale</h2>
 </div>
 
 
           
       <div className="bg-white rounded-xl shadow-sm p-6">
-      <h2 className="text-lg font-medium mb-4">Dashbored qualité </h2>
+      <h2 className="text-lg font-medium mb-4">Mesure de qualité </h2>
       <div className="h-[300px]">
         <Line data={data} options={options} />
       </div>

@@ -225,20 +225,20 @@ const Accueil = () => {
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <p className="text-xs text-gray-500">Coût Total</p>
-                    <p className="text-lg font-bold text-green-600">${(puitsData[selectedPuit].totalBudget / 1000000).toFixed(1)}M</p>
+                    <p className="text-lg font-bold text-green-600">{(puitsData[selectedPuit].totalBudget / 100000).toFixed(1)}M</p>
                   </div>
                   <CircleChart
-                    data={createChartData(puitsData[selectedPuit].totalBudget / 1000000, 4, '#268F00')}
-                    value={`${(puitsData[selectedPuit].totalBudget / 1000000).toFixed(1)}M $`}
+                    data={createChartData(puitsData[selectedPuit].totalBudget / 100000, 4, '#268F00')}
+                    value={`${(puitsData[selectedPuit].totalBudget / 100000).toFixed(1)}M DZD`}
                     color="#268F00"
                     icon="/images/argent.png"
                     remarque="Excellent"
                   />
                 </div>
                 <div className="flex items-center justify-between mt-auto">
-                  <p className="text-xs text-gray-500">U/UUX Designer Full Time</p>
+                  <p className="text-xs text-gray-500">Pour plus d'infos</p>
                   <button className="bg-[#065882] hover:bg-[#054a6b] text-white text-xs font-bold py-2 px-4 rounded-[2%] w-20 flex items-center justify-center">
-                    Apply
+                    Détails
                   </button>
                 </div>
               </div>
@@ -259,9 +259,9 @@ const Accueil = () => {
                   />
                 </div>
                 <div className="flex items-center justify-between mt-auto">
-                  <p className="text-xs text-gray-500">U/UUX Designer Full Time</p>
+                  <p className="text-xs text-gray-500">Pour plus d'infos</p>
                   <button className="bg-[#065882] hover:bg-[#054a6b] text-white text-xs font-bold py-2 px-4 rounded-[2%] w-20 flex items-center justify-center">
-                    Apply
+                    Détails
                   </button>
                 </div>
               </div>
@@ -280,9 +280,9 @@ const Accueil = () => {
                   />
                 </div>
                 <div className="flex items-center justify-between mt-auto">
-                  <p className="text-xs text-gray-500">U/UUX Designer Full Time</p>
+                  <p className="text-xs text-gray-500">Pour plus d'infos</p>
                   <button className="bg-[#065882] hover:bg-[#054a6b] text-white text-xs font-bold py-2 px-4 rounded-[2%] w-20 flex items-center justify-center">
-                    Apply
+                    Détails
                   </button>
                 </div>
               </div>
@@ -303,7 +303,7 @@ const Accueil = () => {
                 <div className="flex items-center justify-between mt-auto">
                   <p className="text-xs text-gray-500">Opportunités</p>
                   <button className="bg-[#065882] hover:bg-[#054a6b] text-white text-xs font-bold py-2 px-4 rounded-[2%] w-20 flex items-center justify-center">
-                    Apply
+                    Détails
                   </button>
                 </div>
               </div>

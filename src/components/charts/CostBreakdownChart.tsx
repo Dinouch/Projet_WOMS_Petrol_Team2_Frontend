@@ -59,7 +59,7 @@ const CostBreakdownChart: React.FC = () => {
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm h-full">
-      <h3 className="text-lg font-medium text-gray-700 mb-4">Cost Breakdown</h3>
+      <h3 className="text-lg font-medium text-gray-700 mb-4">Répartition des coûts</h3>
       <div className="h-48 flex items-center justify-center">
         <Pie data={data} options={options} />
       </div>

@@ -21,9 +21,16 @@ import ProblemsPage from './pages/probleme.js';
 import EngineerAssignmentPage from './pages/affectationpuit.js';
 import DrillingReportForm from './pages/upload_manuel.js';
 import Uploadonglet from './pages/upload_onglet.js';
+import { AuthProvider } from './API/AuthContext';
+import DrillingParameters from './components/DrillingParameters.jsx';
+import AlertsPage from './pages/alertes.jsx';
+import GanttChartMng from './pages/GanttChartMng.tsx';
+
+
 function App() {
   return (
     <Router>
+      <AuthProvider>
       <Routes>
         {/* Upload sans Layout */}
         <Route path="/login" element={<LoginPage />} />
@@ -38,6 +45,7 @@ function App() {
             <Layout>
               <Routes>
               <Route path="/profile" element={<UserProfilePage />} />
+              <Route path="/alerte" element={<AlertsPage />} />
                <Route path="/Upload" element={<Uploadonglet />} />
               <Route path="/affectation-puits" element={<EngineerAssignmentPage />} />
               <Route path="/probleme-solution" element={<ProblemsPage/>} />
@@ -46,17 +54,19 @@ function App() {
                 <Route path="/delays" element={<Delays />} />
                 <Route path="/userspage" element={< UsersPage/>} />
                 <Route path="/ganttChart" element={<GanttChart />} />
+                <Route path="/ganttChartmng" element={<GanttChartMng />} />
                 <Route path="/Acceuil" element={<Accueil />} />
                 <Route path="/puit" element={<Puit />} />
                 <Route path="/details_couts" element={<DetailCouts />} />
                 <Route path="/details_delai" element={<DetailDelais />} />
-                <Route path="/Acceuil_ingenieur" element={<FinancialRiskDashboard />} />
+                <Route path="/Acceuil_ingenieur" element={<DrillingParameters />} />
                 <Route path="/dashboard" element={<Dashboard />} />
               </Routes>
             </Layout>
           }
         />
       </Routes>
+      </AuthProvider>
     </Router>
   );
 }

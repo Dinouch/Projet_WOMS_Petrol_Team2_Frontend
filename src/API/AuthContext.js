@@ -35,7 +35,7 @@ export const AuthProvider = ({ children }) => {
       setUser(response.data);
       
       if (response.data.role === 'Ingenieur') {
-        navigate('/Acceuil_ingenieur');
+        navigate('/puit');
       } else {
         navigate('/Acceuil');
       }

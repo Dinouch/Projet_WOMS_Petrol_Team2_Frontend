@@ -168,7 +168,7 @@ const Puit = () => {
                 <div className="flex flex-col w-60"> {/* largeur augmentée */}
                   <label className="font-semibold text-gray-800 mb-1">Phase actuelle</label>
                   <div className="border border-gray-300 rounded-md px-3 py-2" style={{ color: '#8A8A8A' }}>
-                    phase 1
+                    20"
                   </div>
                 </div>
 
@@ -176,7 +176,7 @@ const Puit = () => {
                 <div className="flex flex-col w-60"> {/* même largeur que l'autre */}
                   <label className="font-semibold text-gray-800 mb-1">Opération actuelle</label>
                   <div className="border border-gray-300 rounded-md px-3 py-2" style={{ color: '#8A8A8A' }}>
-                    forage
+                    LOGGING
                   </div>
                 </div>
               </div>
@@ -214,10 +214,10 @@ const Puit = () => {
 
            
 <div className="flex gap-4 h-1/2 ">
-  {/* Coast Performance */}
+  {/* Cost Performance */}
   <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col w-full border border-gray-300">
     <div className="text-center mb-3">
-    <p className="text-sm font-bold" style={{ color: '#2E2E30' }}>Coast Performance</p>
+    <p className="text-sm font-bold" style={{ color: '#2E2E30' }}>Cost Performance</p>
 
     </div>
     <div className="flex flex-col items-center">
@@ -226,7 +226,7 @@ const Puit = () => {
       <CircleChart
         value="80%"
         color="#268F00"
-        centerText="1,6 M $"
+        centerText="1,6 M Dzd"
         icon="/images/argent.png"
         remarque="Excellent"
       />
