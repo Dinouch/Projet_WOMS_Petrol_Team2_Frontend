@@ -12,11 +12,11 @@ const costAlerts = [
 
 // Données d'exemple pour les alertes de délais
 const timeAlerts = [
-  { id: 1, operation: 'Forage P-123', planned: 12, actual: 15, variance: 25, phase: 'Phase 1', date: '2025-05-12', unit: 'jours' },
-  { id: 2, operation: 'Analyse S-456', planned: 8, actual: 12, variance: 50, phase: 'Phase 2', date: '2025-05-10', unit: 'jours' },
-  { id: 3, operation: 'Installation E-789', planned: 5, actual: 6.5, variance: 30, phase: 'Phase 1', date: '2025-05-14', unit: 'jours' },
-  { id: 4, operation: 'Forage P-234', planned: 15, actual: 18, variance: 20, phase: 'Phase 2', date: '2025-05-08', unit: 'jours' },
-  { id: 5, operation: 'Analyse S-567', planned: 7, actual: 7.5, variance: 7, phase: 'Phase 3', date: '2025-05-13', unit: 'jours' }
+  { id: 1, operation: 'MUD', planned: 12, actual: 15, variance: 25, phase: 'Phase 1', date: '2025-05-12', unit: 'jours' },
+  { id: 2, operation: 'LOGGING', planned: 8, actual: 12, variance: 50, phase: 'Phase 2', date: '2025-05-10', unit: 'jours' },
+  { id: 3, operation: 'EQUIPMENT', planned: 5, actual: 6.5, variance: 30, phase: 'Phase 1', date: '2025-05-14', unit: 'jours' },
+  { id: 4, operation: 'MUD', planned: 15, actual: 18, variance: 20, phase: 'Phase 2', date: '2025-05-08', unit: 'jours' },
+  { id: 5, operation: 'LOGGING', planned: 7, actual: 7.5, variance: 7, phase: 'Phase 3', date: '2025-05-13', unit: 'jours' }
 ];
 
 // Données d'exemple pour les alertes globales
@@ -262,7 +262,6 @@ export default function AlertsPage() {
               <table className="w-full border-collapse">
                 <thead>
                   <tr className="bg-gray-50">
-                    <th className="p-3 text-left text-sm font-semibold text-gray-700">Type</th>
                     <th className="p-3 text-left text-sm font-semibold text-gray-700">Opération</th>
                     <th className="p-3 text-left text-sm font-semibold text-gray-700">Phase</th>
                     <th className="p-3 text-right text-sm font-semibold text-gray-700">Budget</th>
@@ -281,7 +280,6 @@ export default function AlertsPage() {
                   ) : (
                     filteredCostAlerts.map(alert => (
                       <tr key={alert.id} className="border-b border-gray-200">
-                        <td className="p-3 text-sm font-medium text-gray-800">{alert.type}</td>
                         <td className="p-3 text-sm text-gray-800">{alert.operation}</td>
                         <td className="p-3 text-sm text-gray-800">{alert.phase}</td>
                         <td className="p-3 text-sm text-right">{formatCurrency(alert.planned)}</td>

@@ -25,6 +25,7 @@ import { AuthProvider } from './API/AuthContext';
 import DrillingParameters from './components/DrillingParameters.jsx';
 import AlertsPage from './pages/alertes.jsx';
 import GanttChartMng from './pages/GanttChartMng.tsx';
+import PuitOp from './components/PuitOp.jsx';
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
             <Layout>
               <Routes>
               <Route path="/profile" element={<UserProfilePage />} />
+              <Route path="/puitop" element={<PuitOp/>} />
               <Route path="/alerte" element={<AlertsPage />} />
                <Route path="/Upload" element={<Uploadonglet />} />
               <Route path="/affectation-puits" element={<EngineerAssignmentPage />} />
