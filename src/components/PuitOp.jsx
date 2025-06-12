@@ -1,377 +1,151 @@
-import { useState } from 'react';
+import React from 'react';
 
-const PuitOp = () => {
-  // État pour stocker les valeurs des rectangles de droite
-  const [rightSideValues, setRightSideValues] = useState({
-    top: 20,
-    middle: 13,
-    bottom: 9,
-    dv3: 3,
-    dv2: 3,
-    dv1: 3,
-    ord2: 4,
-    ord1: 4
-  });
-  
-  // État pour stocker les valeurs prévues (côté gauche - fixe)
-  const leftSideValues = {
-    top: 20,
-    middle: 13.375,
-    bottom: 9.375,
-    dv3: 3,
-    dv2: 3,
-    dv1: 3,
-    ord2: 4,
-    ord1: 4
+export default function MirroredRectangles() {
+  // Dimensions des rectangles - tailles triplées
+  const heights = {
+    small: 48,     // Hauteur du petit rectangle (16×3)
+    medium: 96,    // Hauteur du rectangle moyen (32×3)
+    large: 192,    // Hauteur du grand rectangle (64×3)
+    horizontal: 18  // Hauteur des rectangles horizontaux (6×3)
   };
   
-  // Fonction pour déterminer la couleur selon le dépassement
-  const getColor = (leftValue, rightValue) => {
-    if (rightValue > leftValue * 1.15) return "#ff3333"; // Rouge si dépassement > 15%
-    if (rightValue > leftValue * 1.05) return "#ff9933"; // Orange si dépassement > 5%
-    return "#ffcc00"; // Jaune par défaut
+  const widths = {
+    vertical: 21,       // Largeur des rectangles verticaux (7×3)
+    horizontal: 48     // Largeur des rectangles horizontaux (16×3)
   };
   
-  // Fonction pour mettre à jour les valeurs
-  const handleChange = (field, value) => {
-    setRightSideValues({
-      ...rightSideValues,
-      [field]: parseFloat(value) || 0
-    });
+  const spacings = {
+    betweenSections: 1,  // Espacement triplé entre les groupes (8×3)
+    betweenItems: 12,     // Espacement triplé entre les rectangles (4×3)
+    centerGap1: 135,      // Espace horizontal réduit (en px au lieu de rem)
+    centerGap2: 78        // Espace horizontal réduit (en px au lieu de rem)
   };
-  
-  const scale = 10; // Échelle pour la hauteur des sections
-  
+
+  // Propriétés des connexions en U
+  const connectorThickness = 10; // Épaisseur de la ligne de connexion
+
   return (
-    <div className="flex flex-col items-center mt-4">
-      <h2 className="text-xl font-bold mb-4">Diagramme de Brine</h2>
-      
-      {/* Contrôles pour ajuster les valeurs */}
-      <div className="mb-6 grid grid-cols-3 gap-4 w-full max-w-lg">
-        <div className="col-span-3 text-center font-bold">Ajuster les valeurs du côté droit:</div>
+    <div className="flex flex-col items-center w-full p-16 bg-white">
+      {/* Premier groupe avec effet miroir */}
+      <div className="flex justify-center w-full"  style={{height: `210px`}}>
+        {/* Côté gauche - rectangles jaunes */}
+        <div className="flex">
+          {/* Colonne de textes */}
+          <div className="flex flex-col mr-4 pl-4">
+            <p className="text-lg font-medium" style={{height: `${heights.small}px`}}>20"</p>
+            <p className="text-lg font-medium" style={{height: `${heights.medium}px`}}>13"</p>
+            <p className="text-lg font-medium" style={{height: `${heights.large}px`}}>9"</p>
+          </div>
+          
+          {/* Rectangles jaunes collés */}
+          <div className="flex flex-row items-start">
+            <div className="bg-yellow-400 border border-black" style={{width: `${widths.vertical}px`, height: `${heights.small}px`}}></div>
+            <div className="bg-yellow-400 border border-black" style={{width: `${widths.vertical}px`, height: `${heights.medium}px`}}></div>
+            <div className="bg-yellow-400 border border-black flex flex-col justify-end" style={{width: `${widths.vertical}px`, height: `${heights.large}px`}}>
+                          <div className="bg-black border border-black ml-5" style={{width: `${widths.horizontal-12}px`, height: `${connectorThickness+3}px`}}></div>
+            </div>
+          </div>
+        </div>
         
-        <div className="text-right">Section supérieure:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.top} 
-          onChange={(e) => handleChange('top', e.target.value)} 
-        />
+        {/* Espace central */}
+        <div className='flex justify-center items-end'style={{width: `${spacings.centerGap1}px`, height:`150px`}}>
+          <h3 className="text-2xl font-medium">Brine</h3>
+        </div>
         
-        <div className="text-right">Section milieu:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.middle} 
-          onChange={(e) => handleChange('middle', e.target.value)} 
-        />
-        
-        <div className="text-right">Section inférieure:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.bottom} 
-          onChange={(e) => handleChange('bottom', e.target.value)} 
-        />
-        
-        <div className="text-right">Objectif Dv3:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.dv3} 
-          onChange={(e) => handleChange('dv3', e.target.value)} 
-        />
-        
-        <div className="text-right">Objectif Dv2:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.dv2} 
-          onChange={(e) => handleChange('dv2', e.target.value)} 
-        />
-        
-        <div className="text-right">Objectif Dv1:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.dv1} 
-          onChange={(e) => handleChange('dv1', e.target.value)} 
-        />
-        
-        <div className="text-right">Ord2:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.ord2} 
-          onChange={(e) => handleChange('ord2', e.target.value)} 
-        />
-        
-        <div className="text-right">Ord1:</div>
-        <input 
-          type="number" 
-          className="border px-2 col-span-2"
-          value={rightSideValues.ord1} 
-          onChange={(e) => handleChange('ord1', e.target.value)} 
-        />
+        {/* Côté droit - effet miroir en vert */}
+        <div className="flex">
+          {/* Rectangles verts collés */}
+          <div className="flex flex-row items-start">
+            <div className="bg-green-400 border border-black flex flex-col justify-end" style={{width: `${widths.vertical}px`, height: `${heights.large}px`}}>
+                            <div className="bg-black border border-black ml-[-37px]" style={{width: `${widths.horizontal-12}px`, height: `${connectorThickness+3}px`}}></div>
+            </div>
+            <div className="bg-green-400 border border-black" style={{width: `${widths.vertical}px`, height: `${heights.medium}px`}}></div>
+            <div className="bg-green-400 border border-black " style={{width: `${widths.vertical}px`, height: `${heights.small}px`}}></div>
+          </div>
+          
+        </div>
       </div>
       
-      {/* Diagramme */}
-      <div className="relative" style={{ width: '300px', height: '500px' }}>
-        {/* Container */}
-        <div className="absolute border-2 border-black" style={{ width: '120px', height: '480px', left: '90px' }}>
-          
-          {/* Top section */}
-          <div className="relative border-b-2 border-dotted border-gray-500" style={{ height: `${leftSideValues.top * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <div className="flex items-center">
-                <div className="w-3 h-0 border-t-8 border-t-black border-l-8 border-l-transparent"></div>
-                <span className="font-bold">20"</span>
-              </div>
-            </div>
-            
-            {/* Section label */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="font-bold text-xl">Brine</span>
-            </div>
-            
-            {/* Left rectangle (prévu) */}
-            <div 
-              className="absolute bg-green-500" 
-              style={{ width: '15px', height: '100%', left: '-15px' }}
-            ></div>
-            
-            {/* Right rectangle (réel) */}
-            <div 
-              className="absolute" 
-              style={{ 
-                width: '15px', 
-                height: `${(rightSideValues.top / leftSideValues.top) * 100}%`, 
-                right: '-15px',
-                backgroundColor: getColor(leftSideValues.top, rightSideValues.top)
-              }}
-            ></div>
+      {/* Titre Objectifs */}
+      <div className="flex justify-between w-1/2 mb-12" style={{height: `${spacings.betweenSections}px`}}>
+        <h3 className="text-3xl font-bold">Objectifs</h3>
+      </div>
+      
+      {/* Deuxième groupe avec effet miroir */}
+      <div className="flex justify-center w-full relative">
+        {/* Côté gauche - rectangles jaunes */}
+        <div className="flex flex-col space-y-2 mb-8">
+          <div className="flex items-center" id="connector-start-1">
+            <p className="mr-6 text-lg font-medium">DV3</p>
+            <div className="bg-yellow-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
-          
-          {/* Middle section */}
-          <div className="relative border-b-2 border-dotted border-gray-500" style={{ height: `${leftSideValues.middle * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <div className="flex items-center">
-                <div className="w-3 h-0 border-t-8 border-t-black border-l-8 border-l-transparent"></div>
-                <span className="font-bold">13 3/8</span>
-              </div>
-            </div>
-            
-            {/* Left rectangle (prévu) */}
-            <div 
-              className="absolute bg-green-500" 
-              style={{ width: '15px', height: '100%', left: '-15px' }}
-            ></div>
-            
-            {/* Right rectangle (réel) */}
-            <div 
-              className="absolute" 
-              style={{ 
-                width: '15px', 
-                height: `${(rightSideValues.middle / leftSideValues.middle) * 100}%`, 
-                right: '-15px',
-                backgroundColor: getColor(leftSideValues.middle, rightSideValues.middle)
-              }}
-            ></div>
+          <div className="flex items-center" id="connector-start-2">
+            <p className="mr-6 text-lg font-medium">DV2</p>
+            <div className="bg-yellow-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
-          
-          {/* Bottom section */}
-          <div className="relative border-b-2 border-dotted border-gray-500" style={{ height: `${leftSideValues.bottom * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <div className="flex items-center">
-                <div className="w-3 h-0 border-t-8 border-t-black border-l-8 border-l-transparent"></div>
-                <span className="font-bold">9 3/8</span>
-              </div>
-            </div>
-            
-            {/* Left bar */}
-            <div 
-              className="absolute bg-black" 
-              style={{ width: '15px', height: '15px', left: '-15px', bottom: '0px' }}
-            ></div>
-            
-            {/* Right bar */}
-            <div 
-              className="absolute bg-black" 
-              style={{ width: '15px', height: '15px', right: '-15px', bottom: '0px' }}
-            ></div>
-            
-            {/* Objectifs label */}
-            <div className="absolute" style={{ right: '130px', top: '20px' }}>
-              <span className="font-bold">Objectifs</span>
-            </div>
+          <div className="flex items-center" id="connector-start-3">
+            <p className="mr-7 text-lg font-medium">DV1</p>
+            <div className="bg-yellow-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
+        </div>
+        
+        {/* Espace central avec connexions en U */}
+        <div className="relative z-10" style={{width: `${spacings.centerGap2}px`}}>
+          {/* Connexion en U pour la première paire */}
+          <div className="absolute" style={{
+            top: '-78px',
+            left: '-2px',
+            width: '105%',
+            height: '270px',
+            borderBottom: `${connectorThickness}px solid black`,
+            borderLeft: `${connectorThickness}px solid black`,
+            borderRight: `${connectorThickness}px solid black`
+          }}></div>
           
-          {/* Dv3 section */}
-          <div className="relative border-b-0" style={{ height: `${leftSideValues.dv3 * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <span className="font-bold">Dv3</span>
-            </div>
-            
-            {/* Blue line */}
-            <div className="absolute bg-blue-500 h-px" style={{ width: '80%', left: '10%', top: '50%' }}></div>
-            
-            {/* Left rectangle indicator */}
-            <div 
-              className="absolute bg-gray-300" 
-              style={{ width: '30px', height: '6px', left: '-45px', top: 'calc(50% - 3px)' }}
-            ></div>
-            
-            {/* Right rectangle indicator */}
-            <div 
-              className="absolute" 
-              style={{ 
-                width: '30px', 
-                height: '6px', 
-                right: '-45px', 
-                top: 'calc(50% - 3px)',
-                backgroundColor: getColor(leftSideValues.dv3, rightSideValues.dv3)
-              }}
-            ></div>
+        </div>
+        
+        {/* Côté droit - effet miroir en vert */}
+        <div className="flex flex-col space-y-5 mb-8">
+          <div className="flex items-center" id="connector-end-1">
+            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
-          
-          {/* Dv2 section */}
-          <div className="relative border-b-0" style={{ height: `${leftSideValues.dv2 * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <span className="font-bold">Dv2</span>
-            </div>
-            
-            {/* Blue line */}
-            <div className="absolute bg-blue-500 h-px" style={{ width: '80%', left: '10%', top: '50%' }}></div>
-            
-            {/* Left rectangle indicator */}
-            <div 
-              className="absolute bg-gray-300" 
-              style={{ width: '30px', height: '6px', left: '-45px', top: 'calc(50% - 3px)' }}
-            ></div>
-            
-            {/* Right rectangle indicator */}
-            <div 
-              className="absolute" 
-              style={{ 
-                width: '30px', 
-                height: '6px', 
-                right: '-45px', 
-                top: 'calc(50% - 3px)',
-                backgroundColor: getColor(leftSideValues.dv2, rightSideValues.dv2)
-              }}
-            ></div>
+          <div className="flex items-center" id="connector-end-2">
+            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
-          
-          {/* Dv1 section */}
-          <div className="relative border-b-0" style={{ height: `${leftSideValues.dv1 * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <span className="font-bold">Dv1</span>
-            </div>
-            
-            {/* Blue line */}
-            <div className="absolute bg-blue-500 h-px" style={{ width: '80%', left: '10%', top: '50%' }}></div>
-            
-            {/* Left rectangle indicator */}
-            <div 
-              className="absolute bg-gray-300" 
-              style={{ width: '30px', height: '6px', left: '-45px', top: 'calc(50% - 3px)' }}
-            ></div>
-            
-            {/* Right rectangle indicator */}
-            <div 
-              className="absolute" 
-              style={{ 
-                width: '30px', 
-                height: '6px', 
-                right: '-45px', 
-                top: 'calc(50% - 3px)',
-                backgroundColor: getColor(leftSideValues.dv1, rightSideValues.dv1)
-              }}
-            ></div>
-          </div>
-          
-          {/* Ord2 section */}
-          <div className="relative border-b-0" style={{ height: `${leftSideValues.ord2 * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <span className="font-bold">Ord2</span>
-            </div>
-            
-            {/* Left rectangle indicator */}
-            <div 
-              className="absolute bg-gray-300" 
-              style={{ width: '30px', height: '6px', left: '-45px', top: 'calc(50% - 3px)' }}
-            ></div>
-            
-            {/* Right rectangle indicator */}
-            <div 
-              className="absolute" 
-              style={{ 
-                width: '30px', 
-                height: '6px', 
-                right: '-45px', 
-                top: 'calc(50% - 3px)',
-                backgroundColor: getColor(leftSideValues.ord2, rightSideValues.ord2)
-              }}
-            ></div>
-          </div>
-          
-          {/* Ord1 section */}
-          <div className="relative" style={{ height: `${leftSideValues.ord1 * scale}px` }}>
-            {/* Labels */}
-            <div className="absolute" style={{ right: '130px', top: '0px' }}>
-              <span className="font-bold">Ord1</span>
-            </div>
-            
-            {/* Left rectangle indicator */}
-            <div 
-              className="absolute bg-gray-300" 
-              style={{ width: '30px', height: '6px', left: '-45px', top: 'calc(50% - 3px)' }}
-            ></div>
-            
-            {/* Right rectangle indicator */}
-            <div 
-              className="absolute" 
-              style={{ 
-                width: '30px', 
-                height: '6px', 
-                right: '-45px', 
-                top: 'calc(50% - 3px)',
-                backgroundColor: getColor(leftSideValues.ord1, rightSideValues.ord1)
-              }}
-            ></div>
+          <div className="flex items-center" id="connector-end-3">
+            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
         </div>
       </div>
       
-      {/* Légende */}
-      <div className="mt-6 p-4 border rounded-md">
-        <h3 className="font-bold mb-2">Légende:</h3>
-        <div className="flex items-center mb-1">
-          <div className="w-4 h-4 bg-green-500 mr-2"></div>
-          <span>Prévu (côté gauche)</span>
+      {/* Troisième groupe avec effet miroir */}
+      <div className="flex justify-center w-full relative">
+        {/* Côté gauche - rectangles jaunes */}
+        <div className="flex flex-col space-y-2">
+          <div className="flex items-center">
+            <p className="mr-5 text-lg font-medium">Ord2</p>
+            <div className="bg-yellow-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+          </div>
+          <div className="flex items-center">
+            <p className="mr-6 text-lg font-medium">Ord1</p>
+            <div className="bg-yellow-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+          </div>
         </div>
-        <div className="flex items-center mb-1">
-          <div className="w-4 h-4 bg-yellow-400 mr-2"></div>
-          <span>Réel dans les normes (≤ 5% de dépassement)</span>
+        
+        {/* Espace central avec connexions en U */}
+        <div  style={{width: `${spacings.centerGap2}px`}}>
         </div>
-        <div className="flex items-center mb-1">
-          <div className="w-4 h-4 bg-orange-400 mr-2"></div>
-          <span>Dépassement modéré (5-15%)</span>
-        </div>
-        <div className="flex items-center">
-          <div className="w-4 h-4 bg-red-500 mr-2"></div>
-          <span>Dépassement important ({'>'}15%)</span>
+        
+        {/* Côté droit - effet miroir en vert */}
+        <div className="flex flex-col space-y-5 mt-1">
+          <div className="flex items-center">
+            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+          </div>
+          <div className="flex items-center">
+            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+          </div>
         </div>
       </div>
     </div>
   );
-};
-
-export default PuitOp;
+}

@@ -1,118 +1,177 @@
 import React, { useState } from 'react';
+import { Search, Plus, Upload, FileText, ChevronDown, Filter, Settings2 } from 'lucide-react';
 
-const months = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-];
+// Fonction pour obtenir la date du jour au format DD/MM/YYYY
+const getCurrentDate = () => {
+  const today = new Date();
+  const day = String(today.getDate()).padStart(2, '0');
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const year = today.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
+// Fonction pour obtenir le numéro de la semaine actuelle
+const getCurrentWeek = () => {
+  const today = new Date();
+  const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+  const pastDaysOfYear = (today.getTime() - firstDayOfYear.getTime()) / 86400000;
+  return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+};
+
+// Générer les dates des 5 prochaines semaines (cette semaine + 4 suivantes)
+const currentWeek = getCurrentWeek();
+const weeks = Array.from({ length: 5 }, (_, i) => {
+  const startDate = new Date();
+  startDate.setDate(startDate.getDate() + (i * 7));
+  const endDate = new Date(startDate);
+  endDate.setDate(endDate.getDate() + 6);
+  return {
+    weekNum: currentWeek + i,
+    startDate: startDate.toLocaleDateString('fr-FR'),
+    endDate: endDate.toLocaleDateString('fr-FR'),
+    label: `Semaine ${currentWeek + i} (${startDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })} - ${endDate.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' })})`
+  };
+});
+
+// Calculer la position du jour actuel dans la semaine (0 = lundi, 6 = dimanche)
+const getCurrentDayPosition = () => {
+  const today = new Date();
+  return (today.getDay() + 6) % 7; // Ajustement pour lundi=0 à dimanche=6
+};
 
 const phases = [
   {
-    name: "Phase 1",
-    forecast: { start: { month: 0, day: 5 }, end: { month: 0, day: 26 } },
-    actual: { start: { month: 0, day: 7 }, end: { month: 1, day: 10 } },
+    name: "Site Preparation",
+    startDate: weeks[0].startDate,
+    endDate: weeks[1].endDate,
+    color: "bg-gray-300",
+    position: { start: 0, width: 1.5 }
   },
   {
-    name: "Phase 2",
-    forecast: { start: { month: 5, day: 1 }, end: { month: 7, day: 20 } },
-    actual: { start: { month: 5, day: 5 }, end: { month: 8, day: 15 } },
+    name: "Drilling", 
+    startDate: weeks[1].startDate,
+    endDate: weeks[3].endDate,
+    color: "bg-blue-400",
+    position: { start: 7, width: 3 }
   },
   {
-    name: "Phase 3",
-    forecast: { start: { month: 9, day: 5 }, end: { month: 11, day: 26 } },
-    actual: { start: { month: 9, day: 7 }, end: { month: 12, day: 10 } },
+    name: "Mud Logging",
+    startDate: weeks[1].endDate,
+    endDate: weeks[3].startDate, 
+    color: "bg-orange-400",
+    position: { start: 10, width: 1.5 }
   },
   {
-    name: "Phase 4",
-    forecast: { start: { month: 5, day: 1 }, end: { month: 7, day: 20 } },
-    actual: { start: { month: 5, day: 5 }, end: { month: 8, day: 15 } },
+    name: "Casing",
+    startDate: weeks[2].endDate,
+    endDate: weeks[4].startDate,
+    color: "bg-green-400", 
+    position: { start: 14, width: 2 }
+  },
+  {
+    name: "Well Testing",
+    startDate: weeks[3].startDate,
+    endDate: weeks[4].endDate,
+    color: "bg-purple-400",
+    position: { start: 21, width: 2 }
   }
 ];
 
 const GanttChart = () => {
-  const [hoverText, setHoverText] = useState<string | null>(null);
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
-
-  const handleMouseEnter = (
-    start: { month: number; day: number },
-    end: { month: number; day: number },
-    e: React.MouseEvent
-  ) => {
-    const text = `du ${start.day} ${months[start.month]} au ${end.day} ${months[end.month]}`;
-    setHoverText(text);
-    setPosition({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseLeave = () => {
-    setHoverText(null);
-    setPosition(null);
-  };
+  const [searchTerm, setSearchTerm] = useState('');
+  const currentDate = getCurrentDate();
+  const currentDayPosition = getCurrentDayPosition();
 
   return (
-    <div className="relative overflow-x-auto p-6 bg-gray-50 min-h-screen">
-      <div className="min-w-[1100px]">
-        {/* Header */}
-        <div className="grid grid-cols-[200px_repeat(12,minmax(80px,1fr))]">
-          <div className="border p-2 font-bold text-center bg-gray-100">Phases</div>
-          {months.map((month, idx) => (
-            <div key={idx} className="border p-2 text-center font-bold bg-gray-100">{month}</div>
-          ))}
+    <div className="bg-white min-h-screen">
+
+      {/* Date Range */}
+      <div className="bg-white px-4 py-3 border-b border-gray-200">
+        <div className="flex items-center gap-2 text-sm">
+          <span className="text-gray-700">Période de forage:</span>
+          <span className="font-medium">{weeks[0].startDate}</span>
+          <span className="text-gray-500">→</span>  
+          <span className="font-medium">{weeks[4].endDate}</span>
+          <span className="ml-4 text-gray-600">(5 semaines: {weeks[0].label} à {weeks[4].label})</span>
         </div>
-
-        {/* Rows */}
-        {phases.map((phase, idx) => (
-          <div key={idx} className="grid grid-cols-[200px_repeat(12,minmax(80px,1fr))] items-center text-sm">
-            {/* Phase name */}
-            <div className="border p-2 font-semibold bg-white">{phase.name}</div>
-
-            {/* Timeline */}
-            {months.map((_, monthIdx) => (
-              <div key={monthIdx} className="relative border h-14">
-                {/* Forecast (Prévision) */}
-                {monthIdx >= phase.forecast.start.month && monthIdx <= phase.forecast.end.month && (
-                  <div
-                    className="absolute top-3 left-0 right-0 h-2 bg-orange-400 rounded cursor-pointer flex items-center"
-                    onMouseEnter={(e) => handleMouseEnter(phase.forecast.start, phase.forecast.end, e)}
-                    onMouseLeave={handleMouseLeave}
-                  >
-                    {/* Green flag au début */}
-                    {monthIdx === phase.forecast.start.month && (
-                      <div className="w-3 h-3 bg-green-500 rounded-full -ml-2"></div>
-                    )}
-                  </div>
-                )}
-                {/* Actual (Réel) */}
-                {monthIdx >= phase.actual.start.month && monthIdx <= phase.actual.end.month && (
-                  <div
-                    className="absolute bottom-3 left-0 right-0 h-2 bg-blue-400 rounded cursor-pointer"
-                    onMouseEnter={(e) => handleMouseEnter(phase.actual.start, phase.actual.end, e)}
-                    onMouseLeave={handleMouseLeave}
-                  ></div>
-                )}
-              </div>
-            ))}
-          </div>
-        ))}
       </div>
 
-      {/* Tooltip on hover */}
-      {hoverText && position && (
-        <div
-          className="absolute bg-white shadow-lg border rounded px-3 py-2 text-sm z-50"
-          style={{ top: position.y + 10, left: position.x + 10 }}
-        >
-          {hoverText}
-        </div>
-      )}
+      {/* Gantt Chart */}
+      <div className="overflow-x-auto">
+        <div className="min-w-[1000px]">
+          {/* Timeline Header */}
+          <div className="bg-gray-50 border-b border-gray-200">
+            <div className="grid grid-cols-[300px_repeat(5,1fr)] text-xs">
+              <div className="border-r border-gray-200 p-3"></div>
+              {weeks.map((week, idx) => (
+                <div key={idx} className="border-r border-gray-200 p-2 text-center">
+                  <div className="font-medium text-gray-700">{week.label}</div>
+                </div>
+              ))}
+            </div>
+          </div>
 
-      {/* Légende */}
-      <div className="flex gap-6 mt-8 items-center">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-2 bg-orange-400 rounded"></div>
-          <span>Prévision</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-2 bg-blue-400 rounded"></div>
-          <span>Réel</span>
+          {/* Table Header */}
+          <div className="bg-white border-b border-gray-200">
+            <div className="grid grid-cols-[300px_repeat(5,1fr)] text-sm">
+              <div className="border-r border-gray-200 p-3 bg-gray-50">
+                <div className="font-medium text-gray-700 mb-1">Phase de forage</div>
+                <div className="flex gap-6 text-xs text-gray-500">
+                  <span>Date de début</span>
+                  <span>Date de fin</span>
+                </div>
+              </div>
+              {weeks.map((_, idx) => (
+                <div key={idx} className="border-r border-gray-200 h-16 relative bg-gray-50">
+                  {/* Ligne rouge pour la date actuelle (seulement dans la première semaine) */}
+                  {idx === 0 && (
+                    <div 
+                      className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+                      style={{ left: `${(currentDayPosition / 7) * 100}%` }}
+                    ></div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Phase Rows */}
+          {phases.map((phase, idx) => (
+            <div key={idx} className="border-b border-gray-100 hover:bg-gray-50">
+              <div className="grid grid-cols-[300px_repeat(5,1fr)] items-center text-sm">
+                <div className="border-r border-gray-200 p-3">
+                  <div className="font-medium text-gray-900 mb-1 truncate">{phase.name}</div>
+                  <div className="flex gap-6 text-xs text-gray-500">
+                    <span>{phase.startDate}</span>
+                    <span>{phase.endDate}</span>
+                  </div>
+                </div>
+                
+                {weeks.map((_, weekIdx) => (
+                  <div key={weekIdx} className="border-r border-gray-200 h-14 relative bg-white">
+                    {/* Ligne rouge pour la date actuelle (seulement dans la première semaine) */}
+                    {weekIdx === 0 && (
+                      <div 
+                        className="absolute top-0 bottom-0 w-0.5 bg-red-500 z-10"
+                        style={{ left: `${(currentDayPosition / 7) * 100}%` }}
+                      ></div>
+                    )}
+                    
+                    {/* Barre de phase */}
+                    {weekIdx === Math.floor(phase.position.start / 7) && (
+                      <div
+                        className={`absolute top-1/2 transform -translate-y-1/2 h-4 rounded ${phase.color} shadow-sm`}
+                        style={{
+                          left: `${((phase.position.start % 7) / 7) * 100}%`,
+                          width: `${(phase.position.width / 7) * 100}%`,
+                        }}
+                      ></div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

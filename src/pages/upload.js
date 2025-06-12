@@ -1,7 +1,16 @@
 import React, { useState } from "react";
-import { FiCalendar, FiUpload, FiX, FiChevronDown, FiCheck, FiPlus, FiMinus } from "react-icons/fi";
+import axios from "axios";
+import { 
+  FiCalendar, 
+  FiUpload, 
+  FiX, 
+  FiChevronDown, 
+  FiCheck, 
+  FiPlus, 
+  FiMinus,
+  FiFile
+} from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
-import DrillingReportForm from "./upload_manuel";
 
 const ReportPage = () => {
   const navigate = useNavigate();
@@ -11,6 +20,15 @@ const ReportPage = () => {
     description: "",
     date: "",
     problems: []
+  });
+
+  // Configuration Axios
+  const api = axios.create({
+    baseURL: 'http://localhost:8090/test_j2ee',
+    withCredentials: true,
+    headers: {
+      'Accept': 'application/json'
+    }
   });
 
   const [showDatePicker, setShowDatePicker] = useState(false);
@@ -25,6 +43,8 @@ const ReportPage = () => {
     solution: ""
   });
   const [showSolution, setShowSolution] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState(null);
 
   const refOptions = generateRefOptions();
   const problemTypes = [
@@ -96,7 +116,16 @@ const ReportPage = () => {
 
   const handleFileUpload = (e) => {
     const uploadedFiles = Array.from(e.target.files);
-    setFiles(uploadedFiles);
+    const validFiles = uploadedFiles.filter(file => 
+      file.name.match(/\.(xlsx|xls)$/i)
+    );
+    
+    if (validFiles.length !== uploadedFiles.length) {
+      setError("Seuls les fichiers .xlsx et .xls sont acceptés");
+    } else {
+      setFiles(prev => [...prev, ...validFiles]);
+      setError(null);
+    }
   };
 
   const handleFileDrop = (e) => {
@@ -123,19 +152,51 @@ const ReportPage = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form submitted:", { ...formData, files });
-    setShowSuccess(true);
-    setTimeout(() => {
-      navigate('/acceuil');
-    }, 3000);
-  };
+    setUploading(true);
+    setError(null);
 
-  // Nouveaux styles plus sobres
-  const inputClass = "w-full bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-700 transition-colors";
-  const buttonClass = "px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors shadow-sm";
-  const sectionTitleClass = "text-lg font-semibold mb-3 text-gray-800 border-l-4 border-orange-500 pl-3";
+    try {
+      const formDataToSend = new FormData();
+      
+      // Ajouter les fichiers
+      files.forEach(file => {
+        formDataToSend.append('excelFile', file);
+      });
+      
+      // Ajouter les données du formulaire
+      Object.entries(formData).forEach(([key, value]) => {
+        if (key === 'problems') {
+          formDataToSend.append(key, JSON.stringify(value));
+        } else {
+          formDataToSend.append(key, value);
+        }
+      });
+
+      console.log("Envoi des données:", formData);
+      console.log("Fichiers à envoyer:", files.map(f => f.name));
+
+      // Envoyer une requête 
+      const response = await api.post('/upload-excel', formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log("Réponse du serveur:", response.data);
+
+      setShowSuccess(true);
+      setTimeout(() => {
+        navigate('/acceuil');
+      }, 3000);
+    } catch (err) {
+      console.error('Erreur:', err);
+      setError(err.response?.data?.message || "Une erreur est survenue lors de l'envoi");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const renderDatePicker = () => {
     const year = currentMonth.getFullYear();
@@ -193,6 +254,11 @@ const ReportPage = () => {
     );
   };
 
+  // Styles
+  const inputClass = "w-full bg-gray-50 rounded-lg px-4 py-2.5 border border-gray-300 focus:outline-none focus:ring-1 focus:ring-orange-500 focus:border-orange-500 text-gray-700 transition-colors";
+  const buttonClass = "px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors shadow-sm disabled:opacity-50";
+  const sectionTitleClass = "text-lg font-semibold mb-3 text-gray-800 border-l-4 border-orange-500 pl-3";
+
   return (
     <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-sm border border-gray-100">
       {showSuccess && (
@@ -205,17 +271,17 @@ const ReportPage = () => {
       )}
 
       <h1 className="text-2xl font-bold mb-6 text-gray-800 pb-2 border-b border-gray-200">
-        Titre du rapport
+        Nouveau Rapport de Forage
       </h1>
 
       <form onSubmit={handleSubmit}>
-        {/* Assurance */}
+        {/* Titre */}
         <div className="mb-6">
           <label className="block text-gray-700 mb-2">Titre Du Rapport</label>
           <input
             type="text"
-            name="assurance"
-            value={formData.assurance}
+            name="titre"
+            value={formData.titre}
             onChange={handleInputChange}
             placeholder="Entrez le titre de votre rapport"
             className={inputClass}
@@ -223,9 +289,9 @@ const ReportPage = () => {
           />
         </div>
 
-        {/* Ref de puit */}
+        {/* Référence de puit */}
         <div className="mb-6 relative">
-          <label className={sectionTitleClass}>Ref de puit</label>
+          <label className={sectionTitleClass}>Référence de puit</label>
           <div className="relative">
             <input
               type="text"
@@ -267,7 +333,7 @@ const ReportPage = () => {
             name="description"
             value={formData.description}
             onChange={handleInputChange}
-            placeholder="À cette option la en va terminer 5-7x au max mais vaut mieux consulter..."
+            placeholder="Décrivez les activités de forage..."
             className={`${inputClass} h-32`}
             required
           />
@@ -388,10 +454,16 @@ const ReportPage = () => {
 
         {/* Upload de fichiers */}
         <div className="mb-6">
-          <label className={sectionTitleClass}>Upload Projects</label>
+          <label className={sectionTitleClass}>Fichiers Excel</label>
           <p className="text-gray-600 mb-4 text-sm">
-            Pieuse upload files in pdf, docx or doc format and make sure the file size is under 2.5 MB.
+            Veuillez uploader des fichiers au format .xls ou .xlsx
           </p>
+
+          {error && (
+            <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
 
           <hr className="border-gray-200 my-4" />
 
@@ -406,20 +478,20 @@ const ReportPage = () => {
               onDrop={handleFileDrop}
             >
               <FiUpload className="mx-auto text-orange-400 mb-3" size={24} />
-              <p className="font-medium text-gray-600 mb-3">No files Uploaded yet!</p>
+              <p className="font-medium text-gray-600 mb-3">Aucun fichier uploadé</p>
               <label className={`${buttonClass} inline-flex items-center px-5 py-1.5 text-sm cursor-pointer`}>
                 <FiUpload className="mr-1" size={14} />
-                Upload
+                Sélectionner des fichiers
                 <input
                   type="file"
                   className="hidden"
                   multiple
-                  accept=".pdf,.docx,.doc,.xlsx"
+                  accept=".xlsx,.xls"
                   onChange={handleFileUpload}
                 />
               </label>
               <p className="text-xs text-gray-500 mt-3">
-                Format: pdf, docx, doc & Max file size: 2.8 MB
+                Ou glissez-déposez vos fichiers ici
               </p>
             </div>
           ) : (
@@ -427,7 +499,10 @@ const ReportPage = () => {
               <ul className="mb-4">
                 {files.map((file, i) => (
                   <li key={i} className="flex items-center justify-between py-2 border-b border-gray-200 last:border-b-0">
-                    <span className="text-gray-700 text-sm truncate max-w-xs">{file.name}</span>
+                    <div className="flex items-center">
+                      <FiFile className="mr-2 text-gray-500" size={16} />
+                      <span className="text-gray-700 text-sm truncate max-w-xs">{file.name}</span>
+                    </div>
                     <button
                       type="button"
                       onClick={() => removeFile(i)}
@@ -444,11 +519,19 @@ const ReportPage = () => {
                   onClick={() => setFiles([])}
                   className="px-3 py-1.5 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-100 text-sm"
                 >
-                  Cancel
+                  Tout supprimer
                 </button>
-                <button type="button" className={`${buttonClass} px-4 py-1.5 text-sm`}>
-                  Done
-                </button>
+                <label className={`${buttonClass} px-4 py-1.5 text-sm cursor-pointer`}>
+                  <FiPlus className="mr-1" size={14} />
+                  Ajouter d'autres fichiers
+                  <input
+                    type="file"
+                    className="hidden"
+                    multiple
+                    accept=".xlsx,.xls"
+                    onChange={handleFileUpload}
+                  />
+                </label>
               </div>
             </div>
           )}
@@ -459,10 +542,22 @@ const ReportPage = () => {
           <button
             type="submit"
             className={`${buttonClass} px-6 py-2.5 text-sm font-medium flex items-center`}
-            disabled={showSuccess}
+            disabled={uploading || showSuccess || files.length === 0}
           >
-            <FiUpload className="mr-2" size={16} />
-            Envoyer le rapport
+            {uploading ? (
+              <>
+                <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Envoi en cours...
+              </>
+            ) : (
+              <>
+                <FiUpload className="mr-2" size={16} />
+                Envoyer le rapport
+              </>
+            )}
           </button>
         </div>
       </form>

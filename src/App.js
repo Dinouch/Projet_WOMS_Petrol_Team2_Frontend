@@ -26,6 +26,7 @@ import DrillingParameters from './components/DrillingParameters.jsx';
 import AlertsPage from './pages/alertes.jsx';
 import GanttChartMng from './pages/GanttChartMng.tsx';
 import PuitOp from './components/PuitOp.jsx';
+import ListPuits from './pages/ListPuits.jsx';
 
 
 function App() {
@@ -45,6 +46,7 @@ function App() {
           element={
             <Layout>
               <Routes>
+              <Route path="/listpuit" element={<ListPuits />} />
               <Route path="/profile" element={<UserProfilePage />} />
               <Route path="/puitop" element={<PuitOp/>} />
               <Route path="/alerte" element={<AlertsPage />} />

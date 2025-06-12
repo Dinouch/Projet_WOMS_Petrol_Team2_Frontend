@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Affichez la sidebar appropriée selon le rôle de l'utilisateur */}
-      {user?.role === 'Ingenieur' ? <SidebarIng /> : <SidebarMng />},
+      {user?.role === 'Ingenieur' ? <SidebarIng /> : <SidebarMng />} 
       
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header />
