@@ -1,70 +1,168 @@
-# Getting Started with Create React App
+# PRISM – Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**WOMS Petrol** est l’interface web de la solution de gestion et de planification préventive des opérations pétrolières destinée à **Sonatrach**. Conçue pour offrir une expérience utilisateur fluide et réactive, elle permet aux ingénieurs et aux managers de :
 
-## Available Scripts
+- Visualiser en temps réel l’état des puits et des installations.
+- Gérer et configurer les alertes critiques (pression, débit, IADC grading, etc.).
+- Planifier les interventions préventives selon les contraintes métiers.
+- Consulter l’historique des rapports et suivre l’avancement des opérations.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## À propos du projet
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+La plateforme frontend de **WOMS Petrol**, conçue pour fournir aux équipes de Sonatrach une interface intuitive et réactive :
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- Une vue consolidée des opérations de forage.
+- Des tableaux de bord configurables pour le suivi des indicateurs métiers.
+- Des outils de cartographie et de visualisation en temps réel.
+- Une gestion fine des alertes et des utilisateurs.
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Fonctionnalités clés
 
-### `npm run build`
+### Tableau de bord principal
+- Vue consolidée des indicateurs métiers.
+- Widgets configurables avec déplacement par glisser-déposer.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Cartographie interactive
+- Affichage géospatial des puits (via OpenStreetMap).
+- Codes couleur selon l’état (
+    Rouge : Alerte dépassement,
+    Orange : Alerte possibilité de dépassement ou léger dépassement,
+    Vert : Alerte sur la stabilité des coûts et délais
+).
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Gestion des alertes
+- Seuils personnalisés par paramètre.
+- Notifications en temps réel.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### Historique et rapports
+- Recherche et filtres avancés.
+- Export PDF et Excel avec résumé graphique.
 
-### `npm run eject`
+### Administration des utilisateurs
+- Création, modification et attribution de rôles.
+- Authentification sécurisée.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### Responsive Design
+- Adapté aux écrans desktop, tablette et mobile.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## Stack technologique
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+| Composant              | Version  | Rôle                              |
+|------------------------|----------|-----------------------------------|
+| React                  | 19.x     | Bibliothèque UI                   |
+| TypeScript             | 5.x      | Typage statique                   |
+| React Router DOM       | 7.5.3    | Gestion des routes                |
+| Tailwind CSS           | 3.x      | Framework CSS utility-first       |
+| Axios                  | 1.x      | Requêtes HTTP                     |
+| Recharts & Chart.js    | Latest   | Visualisation graphique           |
+| Leaflet & React-Leaflet| 1.x      | Cartographie interactive          |
+| Framer Motion          | 7.x      | Animations                        |
+| React Icons & Heroicons| 4.x      | Bibliothèque d’icônes             |
+| react-date-range       | 1.x      | Sélecteur de plages de dates      |
 
-## Learn More
+---
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## Structure du projet
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+```
+src/
+├── assets/              # Images, polices et styles globaux
+├── components/          # Composants réutilisables (UI, formulaires, modales)
+├── pages/               # Pages principales (Login, Dashboard, Profile…)
+├── services/            # Services API (instances Axios)
+├── routes/              # Configuration des routes avec React Router
+├── utils/               # Fonctions utilitaires et constantes
+└── App.js               # Point d’entrée de l’application
+```
 
-### Code Splitting
+### Fichiers de configuration
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+- `tailwind.config.js`
+- `postcss.config.js`
+- `tsconfig.json`
+- `.eslintrc.js` & `.prettierrc`
 
-### Analyzing the Bundle Size
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+## Installation et démarrage
 
-### Making a Progressive Web App
+### 1. Cloner le dépôt
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+```bash
+git clone https://github.com/Dinouch/Projet_WOMS_Petrol_Team2_Frontend.git
+cd src
+```
 
-### Advanced Configuration
+### 2. Installer les dépendances
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+npm install
+```
 
-### Deployment
+### 3. Configurer l’environnement
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Dupliquer `.env.example` en `.env` puis renseigner les variables suivantes :
 
-### `npm run build` fails to minify
+```env
+REACT_APP_API_URL=http://localhost:3000/api
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### 4. Lancer en développement
+
+```bash
+npm start
+```
+
+### 5. Compiler pour la production
+
+```bash
+npm run build
+```
+
+---
+
+## Scripts utiles
+
+| Commande         | Description                                    |
+|------------------|------------------------------------------------|
+| `npm start`      | Démarrage du serveur de développement          |
+| `npm run build`  | Construction optimisée pour la production      |
+| `npm test`       | Exécution des tests unitaires                  |
+| `npm lint`       | Vérification du code (ESLint + Prettier)       |
+
+---
+
+## Contribuer
+
+1. Fork du projet.
+2. Créer une branche :
+
+```bash
+git checkout -b feat/ma-fonctionnalite
+```
+
+3. Committer vos changements :
+
+```bash
+git commit -m "Ajout de ..."
+```
+
+4. Pousser la branche :
+
+```bash
+git push origin feat/ma-fonctionnalite
+```
+
+5. Ouvrir une Pull Request.
+
+Merci de respecter les conventions de commit et la charte de code !
+
+---
+
+**© 2025 - PRISM / WOMS Petrol / Sonatrach**
