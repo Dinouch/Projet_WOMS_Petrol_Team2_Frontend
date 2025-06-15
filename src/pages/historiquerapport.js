@@ -50,15 +50,7 @@ const ReportsHistoryPage = () => {
   });
 
   // Handlers
-  const handleDownload = (reportId) => {
-    console.log('Télécharger le rapport', reportId);
-    // Implémentez la logique de téléchargement ici
-  };
 
-  const handleEdit = (reportId) => {
-    console.log('Modifier le rapport', reportId);
-    // Implémentez la logique d'édition ici
-  };
 
   const handleViewReport = async (reportId) => {
     setLoadingDetails(true);
@@ -178,20 +170,7 @@ const ReportsHistoryPage = () => {
               </div>
 
               <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
-                <button
-                  onClick={() => handleDownload(report.id)}
-                  className="text-gray-600 hover:text-orange-800 p-2 rounded-full hover:bg-blue-50 transition-colors"
-                  title="Télécharger"
-                >
-                  <FiDownload size={18} />
-                </button>
-                <button
-                  onClick={() => handleEdit(report.id)}
-                  className="text-gray-600 hover:text-orange-800 p-2 rounded-full hover:bg-blue-50 transition-colors"
-                  title="Modifier"
-                >
-                  <FiEdit size={18} />
-                </button>
+            
                 <button
                   onClick={() => handleViewReport(report.id)}
                   className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg flex items-center text-sm"
