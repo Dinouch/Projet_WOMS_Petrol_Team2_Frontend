@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import axios from 'axios';
 import { Chart as ChartJS, ArcElement } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
@@ -45,11 +46,14 @@ function ZoomToMarker({ position, selectedPuit }) {
 }
 
 const Accueil = () => {
-  const [selectedPuit, setSelectedPuit] = useState('A');
+  const [puitsData, setPuitsData] = useState({});
+  const [selectedPuit, setSelectedPuit] = useState(null);
   const [showPuitList, setShowPuitList] = useState(false);
   const [showPuitDetails, setShowPuitDetails] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filteredPuits, setFilteredPuits] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const mapRef = useRef(null);
 
   const navigate = useNavigate();
@@ -57,68 +61,82 @@ const Accueil = () => {
     navigate('/puit');
   };
 
-  // Données des puits
-  const puitsData = {
-    A: {
-      name: "Puit A",
-      position: [36.7525, 3.0420], // Alger
-      x: '383877,717',
-      y: '07°48\'38\'\'71797',
-      latitude: '3375030,573',
-      longitude: '30°30\'15\'\'12758',
-      elevation: 'Z:1215,6m/Z:1255,6m',
-      cost: 120000,
-      problems: 15,
-      progress: 65,
-      monthlyCost: 100000,
-      globalDelay: 58,
-      totalBudget: 1600000,
-      startDate: '15/03/2023',
-      endDate: '30/09/2024',
-      status: 'En cours',
-      team: 'Équipe Alpha',
-      equipment: 'Foreuse XT-2000'
-    },
-    B: {
-      name: "Puit B",
-      position: [28.0339, 1.6596], // Sud Algérien
-      x: '383878,123',
-      y: '07°48\'39\'\'12345',
-      latitude: '3375031,321',
-      longitude: '30°30\'16\'\'54321',
-      elevation: 'Z:1216,2m/Z:1256,8m',
-      cost: 95000,
-      problems: 8,
-      progress: 42,
-      monthlyCost: 85000,
-      globalDelay: 42,
-      totalBudget: 1200000,
-      startDate: '10/05/2023',
-      endDate: '15/12/2024',
-      status: 'En cours',
-      team: 'Équipe Beta',
-      equipment: 'Foreuse XT-1800'
-    },
-    C: {
-      name: "Puit C",
-      position: [34.8828, -1.3167], // Oran
-      x: '383879,456',
-      y: '07°48\'40\'\'45678',
-      latitude: '3375032,456',
-      longitude: '30°30\'17\'\'98765',
-      elevation: 'Z:1217,0m/Z:1257,5m',
-      cost: 110000,
-      problems: 12,
-      progress: 58,
-      monthlyCost: 95000,
-      globalDelay: 51,
-      totalBudget: 1400000,
-      startDate: '22/06/2023',
-      endDate: '28/02/2025',
-      status: 'En cours',
-      team: 'Équipe Gamma',
-      equipment: 'Foreuse XT-2200'
-    }
+  // Fonction pour générer des données aléatoires pour les indicateurs
+  const generateRandomIndicators = (id) => {
+    // Utilisation de l'ID comme seed pour avoir des valeurs cohérentes
+    const seed = id;
+    return {
+      cost: 100000 + (seed * 20000),
+      problems: seed % 10,
+      progress: 30 + (seed * 10) % 70,
+      monthlyCost: 50000 + (seed * 5000),
+      globalDelay: 20 + (seed * 5) % 80,
+      totalBudget: 500000 + (seed * 100000),
+      startDate: new Date(2023, seed % 12, (seed % 28) + 1).toLocaleDateString(),
+      endDate: new Date(2024, seed % 12, (seed % 28) + 1).toLocaleDateString(),
+      status: ['En cours', 'Terminé', 'En retard'][seed % 3],
+      team: `Équipe ${String.fromCharCode(65 + (seed % 5))}`,
+      equipment: `Foreuse XT-${2000 + (seed % 100)}`
+    };
+  };
+
+  // Récupération des données des puits depuis l'API
+  useEffect(() => {
+    const fetchPuits = async () => {
+      try {
+        const response = await axios.get('http://localhost:8090/test_j2ee/puits');
+        
+        // Transformer les données de l'API en format attendu par le composant
+        const transformedData = response.data.reduce((acc, puit) => {
+          // Créer un identifiant unique en combinant id_puit et nom_puit
+          const uniqueId = `${puit.nom_puit}-${puit.id_puit}`;
+          
+          acc[uniqueId] = {
+            id: puit.id_puit,
+            uniqueId: uniqueId,
+            name: `Puit ${puit.nom_puit}-${puit.id_puit}`,
+            position: getPositionByWilaya(puit.zone.wilaya),
+            x: puit.zone.x,
+            y: puit.zone.y,
+            status: puit.statut_delai,
+            statut_cout : puit.statut_cout,
+            latitude: puit.zone.x,
+            longitude: puit.zone.y,
+            elevation: `Z:${puit.zone.elevation}m`,
+            wilaya: puit.zone.wilaya,
+            ...generateRandomIndicators(puit.id_puit)
+          };
+          return acc;
+        }, {});
+
+        setPuitsData(transformedData);
+        
+        // Sélectionner le premier puit par défaut
+        if (response.data.length > 0) {
+          const firstPuitId = `${response.data[0].nom_puit}-${response.data[0].id_puit}`;
+          setSelectedPuit(firstPuitId);
+        }
+        
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+        console.error('Erreur lors de la récupération des puits:', err);
+      }
+    };
+
+    fetchPuits();
+  }, []);
+
+  // Fonction pour obtenir les coordonnées géographiques par wilaya
+  const getPositionByWilaya = (wilaya) => {
+    const positions = {
+      'Alger': [36.7525, 3.0420],
+      'ORAN': [35.6971, -0.6337],
+      'Constantine': [36.3650, 6.6147],
+      // Ajouter d'autres wilayas au besoin
+    };
+    return positions[wilaya] || [28.0339, 1.6596]; // Position par défaut (Sud Algérien)
   };
 
   // Options des graphiques cercle à 80%
@@ -193,10 +211,43 @@ const Accueil = () => {
   // Filtrage des puits basé sur la recherche
   useEffect(() => {
     const results = Object.keys(puitsData).filter(puitId =>
-      puitsData[puitId].name.toLowerCase().includes(searchTerm.toLowerCase())
+      puitsData[puitId].name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      puitsData[puitId].wilaya.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredPuits(results);
-  }, [searchTerm]);
+  }, [searchTerm, puitsData]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Chargement des données des puits...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative max-w-md">
+          <strong className="font-bold">Erreur! </strong>
+          <span className="block sm:inline">{error}</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedPuit || Object.keys(puitsData).length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600">Aucun puit disponible</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
@@ -403,7 +454,7 @@ const Accueil = () => {
             </AnimatePresence>
           </div>
 
-          {/* Détails du puit sélectionné en bas à droite - MODIFIÉ POUR ÊTRE CARRÉ ET AVEC COULEURS GRIS/ORANGE */}
+          {/* Détails du puit sélectionné en bas à droite */}
           <AnimatePresence>
             {showPuitDetails && (
               <motion.div
@@ -424,11 +475,12 @@ const Accueil = () => {
                         ×
                       </button>
                     </div>
-                    <p className="text-sm opacity-90 mt-1">Localisation: {puitsData[selectedPuit].latitude}, {puitsData[selectedPuit].longitude}</p>
+                    <p className="text-sm opacity-90 mt-1">Wilaya: {puitsData[selectedPuit].wilaya}</p>
+                    <p className="text-sm opacity-90">Localisation: {puitsData[selectedPuit].latitude}, {puitsData[selectedPuit].longitude}</p>
                   </div>
                   
                   <div className="p-4">
-                    {/* Tableau de détails - style carré et gris/orange */}
+                    {/* Tableau de détails */}
                     <div className="overflow-x-auto">
                       <table className="min-w-full divide-y divide-gray-200">
                         <tbody className="bg-white divide-y divide-gray-200">
@@ -456,9 +508,6 @@ const Accueil = () => {
                             <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-600 border border-gray-100">Date fin prévue</td>
                             <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-800 border border-gray-100">{puitsData[selectedPuit].endDate}</td>
                           </tr>
-                          
-                         
-                          
                         </tbody>
                       </table>
                     </div>
@@ -474,6 +523,12 @@ const Accueil = () => {
                       </div>
                       <div className="mt-2 text-xs text-gray-600 border border-gray-100 p-2 rounded">
                         <span className="font-medium">Élévation:</span> {puitsData[selectedPuit].elevation}
+                      </div>
+                      <div className="mt-2 text-xs text-gray-600 border border-gray-100 p-2 rounded">
+                        <span className="font-medium">Statut:</span> {puitsData[selectedPuit].status}
+                      </div>
+                      <div className="mt-2 text-xs text-gray-600 border border-gray-100 p-2 rounded">
+                        <span className="font-medium">statut couts:</span> {puitsData[selectedPuit].statut_cout}
                       </div>
                     </div>
                   </div>
@@ -507,7 +562,9 @@ const Accueil = () => {
                 >
                   <Popup className="custom-popup">
                     <div className="font-bold text-gray-800">{puitsData[puitId].name}</div>
-                    <div className="text-xs text-gray-600 mt-1">Progression: {puitsData[puitId].progress}%</div>
+                    <div className="text-xs text-gray-600 mt-1">Wilaya: {puitsData[puitId].wilaya}</div>
+                    <div className="text-xs text-gray-600">Progression: {puitsData[puitId].progress}%</div>
+                     <div className="text-xs text-gray-600">Statut {puitsData[puitId].status}</div>
                     <div className="text-xs text-gray-600">Coût: ${puitsData[puitId].cost.toLocaleString()}</div>
                   </Popup>
                 </Marker>
