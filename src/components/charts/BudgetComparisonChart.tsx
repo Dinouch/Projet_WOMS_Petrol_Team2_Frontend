@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -24,22 +25,54 @@ ChartJS.register(
 );
 
 const BudgetComparisonChart: React.FC = () => {
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
-  
+  const [labels, setLabels] = useState<string[]>([]);
+  const [realCosts, setRealCosts] = useState<number[]>([]);
+  const [plannedCosts, setPlannedCosts] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchMonthlyCosts = async () => {
+      try {
+        const response = await axios.get(
+          'http://localhost:8090/test_j2ee/analyseCouts?action=sommeParMois&nomPuit=A'
+        );
+
+        if (response.data && response.data.data) {
+          const labelArray: string[] = [];
+          const realArray: number[] = [];
+          const plannedArray: number[] = [];
+
+          response.data.data.forEach((item: any) => {
+            labelArray.push(`${item.mois} ${item.annee}`);
+            realArray.push(parseFloat(item.sommeReel));
+            plannedArray.push(parseFloat(item.sommePrevu));
+          });
+
+          setLabels(labelArray);
+          setRealCosts(realArray);
+          setPlannedCosts(plannedArray);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la récupération des données mensuelles:', error);
+      }
+    };
+
+    fetchMonthlyCosts();
+  }, []);
+
   const data = {
-    labels: months,
+    labels: labels,
     datasets: [
       {
         label: 'Budget Réel',
-        data: [8000, 15000, 20000, 25000, 28000, 25000, 22000],
+        data: realCosts,
         borderColor: '#4b5563',
         backgroundColor: 'transparent',
         tension: 0.4,
         borderWidth: 2,
       },
       {
-        label: 'Budget prévu',
-        data: [10000, 14000, 16000, 20000, 25000, 28000, 30000],
+        label: 'Budget Prévu',
+        data: plannedCosts,
         borderColor: '#d1d5db',
         backgroundColor: 'transparent',
         borderDash: [5, 5],
@@ -77,13 +110,18 @@ const BudgetComparisonChart: React.FC = () => {
         beginAtZero: true,
         ticks: {
           callback: function(tickValue: number | string) {
-            return tickValue + 'K';
-          }
-        }
+            return tickValue + ' $';
+          },
+          color: '#6b7280',
+          font: { size: 12 },
+        },
+        grid: { color: '#f3f4f6' },
       },
       x: {
-        grid: {
-          display: false
+        grid: { display: false },
+        ticks: {
+          color: '#6b7280',
+          font: { size: 12 },
         }
       }
     },
@@ -92,7 +130,7 @@ const BudgetComparisonChart: React.FC = () => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm h-full">
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-medium text-gray-700">Budgets et coûts</h3>
+        <h3 className="text-lg font-medium text-gray-700">Budgets et Coûts</h3>
       </div>
       <div className="h-48">
         <Line data={data} options={options} />

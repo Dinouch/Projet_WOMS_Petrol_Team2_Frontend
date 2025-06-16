@@ -5,186 +5,195 @@ import 'react-date-range/dist/theme/default.css';
 import { format, parse, isWithinInterval } from 'date-fns';
 import fr from 'date-fns/locale/fr';
 import { motion, AnimatePresence } from 'framer-motion';
-import DetailCouts from './details_couts';
+import axios from 'axios';
 
 const DetailDelais = () => {
   // State for summary cards data
-  const [summaryData] = useState([
+  const [summaryData, setSummaryData] = useState([
     {
       title: "Total de jour",
-      value: "101 jours",
-      change: "10.2 +1.01% this week",
+      value: "0 jours",
+      change: "0.00% this week",
       changePositive: true
     },
     {
       title: "Total prévu reste",
       value: "0 jours",
-      change: "31 -7.49% this week",
+      change: "0.00% this week",
       changePositive: false
     },
     {
       title: "Total non prévu",
-      value: "17 jours",
-      change: "2.56 -0.91% this week",
+      value: "0 jours",
+      change: "0.00% this week",
       changePositive: false
     },
     {
       title: "nbr de jour prévu",
-      value: "84",
-      change: "7.2 +1.51% this week",
+      value: "120",
+      change: "0.00% this week",
       changePositive: true
     }
   ]);
 
-  // State for operations journal data
-  const [operationsJournal] = useState([
-    {
-      id: "#12594",
-      date: "Dec 1, 2021",
-      dateObj: new Date(2021, 11, 1),
-      phase: "Phase 26\"",
-      depth: "120 ft",
-      progress: "120 ft",
-      npt: "0 h",
-      cumulativeNpt: "10 h",
-      status: "Sous contrôle",
-      statusType: "controlled",
-      details: "**"
-    },
-    {
-      id: "#12490",
-      date: "Dec 2, 2025",
-      dateObj: new Date(2025, 11, 2),
-      phase: "Phase 12 1/4",
-      depth: "140 ft",
-      progress: "135 ft",
-      npt: "2 h",
-      cumulativeNpt: "12 h",
-      status: "À surveiller",
-      statusType: "warning",
-      details: "**"
-    },
-    {
-      id: "#12306",
-      date: "Dec 3, 2021",
-      dateObj: new Date(2021, 11, 3),
-      phase: "Phase 16\"",
-      depth: "160 ft",
-      progress: "40 ft",
-      npt: "3 h",
-      cumulativeNpt: "13 h",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    },
-    {
-      id: "#12307",
-      date: "Dec 4, 2021",
-      dateObj: new Date(2021, 11, 4),
-      phase: "Phase 8 1/2",
-      depth: "100 ft",
-      progress: "102 ft",
-      npt: "1 h",
-      cumulativeNpt: "14 h",
-      status: "Sous contrôle",
-      statusType: "controlled",
-      details: "**"
-    },
-    {
-      id: "#12308",
-      date: "Dec 5, 2021",
-      dateObj: new Date(2021, 11, 5),
-      phase: "Phase 16\"",
-      depth: "80 ft",
-      progress: "80 ft",
-      npt: "3 h",
-      cumulativeNpt: "13 h",
-      status: "Sous contrôle",
-      statusType: "controlled",
-      details: "**"
-    },
-    {
-      id: "#12309",
-      date: "Dec 6, 2021",
-      dateObj: new Date(2021, 11, 6),
-      phase: "Phase 26\"",
-      depth: "123 ft",
-      progress: "90 ft",
-      npt: "0 h",
-      cumulativeNpt: "17 h",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    },
-    {
-      id: "#12310",
-      date: "Dec 7, 2021",
-      dateObj: new Date(2021, 11, 7),
-      phase: "Phase 26\"",
-      depth: "130 ft",
-      progress: "110 ft",
-      npt: "0 h",
-      cumulativeNpt: "17 h",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    },
-    {
-      id: "#12311",
-      date: "Jan 15, 2026",
-      dateObj: new Date(2026, 0, 15),
-      phase: "Phase 12\"",
-      depth: "150 ft",
-      progress: "95 ft",
-      npt: "5 h",
-      cumulativeNpt: "22 h",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    }
-  ]);
+  // State for delai stats from API
+  const [delaiStats, setDelaiStats] = useState({
+    statutGlobalDelai: "Vert",
+    nbrJourX: 0,
+    totalJour: 0,
+    totalPrevuReste: 120,
+    totalNonPrevu: 0
+  });
 
-  // Daily operations data for popup
-  const dailyOperations = {
-    "Dec 1, 2021": [
-      { no: "13E", id: "#12594", name: "Operation P", timing: "00:00 - 04:30", status: "Sous contrôle", statusType: "controlled" },
-      { no: "2N5", id: "#12490", name: "Operation R", timing: "04:00 - 05:30", status: "À surveiller", statusType: "warning" },
-      { no: "46G", id: "#12306", name: "Operation I", timing: "05:45 - 06:30", status: "Dépassement", statusType: "exceeded" },
-      { no: "483", id: "#12306", name: "Operation S", timing: "06:30 - 07:30", status: "Sous contrôle", statusType: "controlled" }
-    ],
-    "Dec 2, 2025": [
-      { no: "23L", id: "#12306", name: "Operation M", timing: "7h:40 - 09:15", status: "Dépassement", statusType: "exceeded" },
-      { no: "3Y9", id: "#12306", name: "Operation B", timing: "9:20 - 11:30", status: "Dépassement", statusType: "exceeded" },
-      { no: "3E4", id: "#12306", name: "Operation E", timing: "12:00 - 13:30", status: "Dépassement", statusType: "exceeded" }
-    ],
-    "Dec 3, 2021": [
-      { no: "13E", id: "#12594", name: "Operation P", timing: "00:00 - 04:30", status: "Sous contrôle", statusType: "controlled" },
-      { no: "2N5", id: "#12490", name: "Operation R", timing: "04:00 - 05:30", status: "À surveiller", statusType: "warning" }
-    ],
-    "Dec 4, 2021": [
-      { no: "46G", id: "#12306", name: "Operation I", timing: "05:45 - 06:30", status: "Dépassement", statusType: "exceeded" },
-      { no: "483", id: "#12306", name: "Operation S", timing: "06:30 - 07:30", status: "Sous contrôle", statusType: "controlled" }
-    ],
-    "Dec 5, 2021": [
-      { no: "23L", id: "#12306", name: "Operation M", timing: "7h:40 - 09:15", status: "Dépassement", statusType: "exceeded" }
-    ],
-    "Dec 6, 2021": [
-      { no: "3Y9", id: "#12306", name: "Operation B", timing: "9:20 - 11:30", status: "Dépassement", statusType: "exceeded" },
-      { no: "3E4", id: "#12306", name: "Operation E", timing: "12:00 - 13:30", status: "Dépassement", statusType: "exceeded" }
-    ],
-    "Dec 7, 2021": [
-      { no: "13E", id: "#12594", name: "Operation P", timing: "00:00 - 04:30", status: "Sous contrôle", statusType: "controlled" },
-      { no: "2N5", id: "#12490", name: "Operation R", timing: "04:00 - 05:30", status: "À surveiller", statusType: "warning" },
-      { no: "46G", id: "#12306", name: "Operation I", timing: "05:45 - 06:30", status: "Dépassement", statusType: "exceeded" }
-    ],
-    "Jan 15, 2026": [
-      { no: "15A", id: "#12311", name: "Operation X", timing: "08:00 - 12:30", status: "Dépassement", statusType: "exceeded" },
-      { no: "15B", id: "#12311", name: "Operation Y", timing: "13:00 - 17:45", status: "Dépassement", statusType: "exceeded" }
-    ]
+  // State for operations data from API
+  const [operationsData, setOperationsData] = useState([]);
+  const [dailyOperations, setDailyOperations] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Fetch summary data from API
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch delai stats
+        const delaiResponse = await axios.get('http://localhost:8090/test_j2ee/analyseDelais?action=statistiquesGlobales&nomPuit=A');
+        if (delaiResponse.data.success) {
+          setDelaiStats(delaiResponse.data);
+          
+          // Update summary cards with real data
+          setSummaryData([
+            {
+              title: "Total de jour",
+              value: `${delaiResponse.data.nbrJourX} jours`,
+              change: "10.2 +1.01% this week",
+              changePositive: true
+            },
+            {
+              title: "Total prévu reste",
+              value: `${delaiResponse.data.totalPrevuReste} jours`,
+              change: "31 -7.49% this week",
+              changePositive: false
+            },
+            {
+              title: "Total non prévu",
+              value: `${delaiResponse.data.totalNonPrevu} jours`,
+              change: "2.56 -0.91% this week",
+              changePositive: false
+            },
+            {
+              title: "nbr de jour prévu",
+              value: "120",
+              change: "7.2 +1.51% this week",
+              changePositive: true
+            }
+          ]);
+        }
+
+        // Fetch operations data
+        const response = await fetch('http://localhost:8090/test_j2ee/summaryByDate');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const html = await response.text();
+        
+        // Parse the HTML to extract table data
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const rows = doc.querySelectorAll('table tr');
+        
+        const data = [];
+        
+        // Skip header row and process data rows
+        for (let i = 1; i < rows.length; i++) {
+          const cells = rows[i].querySelectorAll('td');
+          if (cells.length >= 7) {
+            data.push({
+              date: cells[0].textContent === 'null' ? null : cells[0].textContent,
+              originalDate: cells[0].textContent, // Store original date format for API calls
+              phase: cells[1].textContent === 'null' ? null : cells[1].textContent,
+              depth: cells[2].textContent === 'null' ? null : cells[2].textContent,
+              progress: cells[3].textContent === 'null' ? null : cells[3].textContent,
+              npt: cells[4].textContent === 'null' ? null : cells[4].textContent,
+              cumulativeNpt: cells[5].textContent === 'null' ? null : cells[5].textContent,
+              status: cells[6].textContent,
+              statusType: cells[6].textContent === "Sous Contrôle" ? "controlled" : 
+                         cells[6].textContent === "À surveiller" ? "warning" : "exceeded"
+            });
+          }
+        }
+        
+        // Filter out null entries and add date objects
+        const processedData = data
+          .filter(item => item.date !== null)
+          .map(item => ({
+            ...item,
+            dateObj: item.date ? parse(item.date, 'yyyy-MM-dd', new Date()) : new Date(),
+            id: `#${Math.floor(10000 + Math.random() * 90000)}`,
+            displayDate: item.date ? format(parse(item.date, 'yyyy-MM-dd', new Date()), 'MMM d, yyyy') : ''
+          }));
+        
+        setOperationsData(processedData);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+    
+    fetchData();
+  }, []);
+
+  // Fetch daily operations when a date is selected
+  const fetchDailyOperations = async (date) => {
+    try {
+      const response = await fetch(`http://localhost:8090/test_j2ee/delaiByDate?date=${date}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const html = await response.text();
+      
+      // Créer un élément DOM temporaire pour parser le HTML
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html;
+      
+      // Trouver la table
+      const table = tempDiv.querySelector('table');
+      if (!table) {
+        console.error('Table not found in HTML response');
+        return [];
+      }
+      
+      const operations = [];
+      const rows = table.querySelectorAll('tr');
+      
+      // Ignorer l'en-tête (première ligne) et traiter les lignes suivantes
+      for (let i = 1; i < rows.length; i++) {
+        const cells = rows[i].querySelectorAll('td');
+        if (cells.length >= 5) {
+          let status = cells[4]?.textContent?.trim() || 'N/A';
+          status = status.replace(/^\s+|\s+$/g, ''); // Supprimer les espaces
+          
+          operations.push({
+            startTime: cells[0]?.textContent?.trim() || 'N/A',
+            endTime: cells[1]?.textContent?.trim() || 'N/A',
+            operation: cells[2]?.textContent?.trim() || 'N/A',
+            duration: cells[3]?.textContent?.trim() || 'N/A',
+            status: status
+          });
+        }
+      }
+      
+      console.log('Parsed operations:', operations);
+      return operations;
+    } catch (error) {
+      console.error('Error fetching daily operations:', error);
+      return [];
+    }
   };
 
   // State for popup
   const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDateOperations, setSelectedDateOperations] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
   const [filter, setFilter] = useState({
     status: 'all',
@@ -197,15 +206,15 @@ const DetailDelais = () => {
 
   // Calculate min and max dates from operations data
   useEffect(() => {
-    if (operationsJournal.length > 0) {
-      const dates = operationsJournal.map(op => op.dateObj);
+    if (operationsData.length > 0) {
+      const dates = operationsData.map(op => op.dateObj);
       const minDate = new Date(Math.min(...dates.map(date => date.getTime())));
       const maxDate = new Date(Math.max(...dates.map(date => date.getTime())));
       setDateRange({ min: minDate, max: maxDate });
     }
-  }, [operationsJournal]);
+  }, [operationsData]);
 
-  // Status indicator component
+  // Status indicator component for main table
   const StatusIndicator = ({ type, status }) => {
     const colorVariants = {
       controlled: "bg-[#34C759]",
@@ -227,6 +236,36 @@ const DetailDelais = () => {
     );
   };
 
+  // Status indicator component for popup table
+  const PopupStatusIndicator = ({ status }) => {
+    // Déterminer le type et la couleur en fonction du statut
+    let bgColor;
+    
+    if (status === "Sous Contrôle") {
+      bgColor = "bg-[#34C759]";
+    } else if (status === "À surveiller") {
+      bgColor = "bg-[#FF9500]";
+    } else if (status === "Dépassement") {
+      bgColor = "bg-[#FF3B30]";
+    } else {
+      // Cas par défaut pour les statuts non reconnus
+      bgColor = "bg-gray-400";
+    }
+
+    return (
+      <div className="px-2">
+        <motion.div 
+          className="inline-flex items-center rounded-full border border-gray-200 py-1 px-3"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+        >
+          <div className={`w-2 h-2 rounded-full mr-2 ${bgColor}`}></div>
+          <span className="text-xs font-semibold whitespace-nowrap">{status}</span>
+        </motion.div>
+      </div>
+    );
+  };
+
   // Close icon component
   const CloseIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500 hover:text-gray-700 cursor-pointer" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -242,41 +281,48 @@ const DetailDelais = () => {
   );
 
   // Handle details click
-  const handleDetailsClick = (operation) => {
-    setSelectedDate(operation.date);
+  const handleDetailsClick = async (operation) => {
+    const apiDate = operation.originalDate; // Use the original date format for API call
+    const displayDate = operation.displayDate; // Formatted date for display
+    
+    setSelectedDate(displayDate);
     setShowPopup(true);
+    console.log('Fetching operations for date:', apiDate);
+    
+    // Fetch operations for this date
+    const ops = await fetchDailyOperations(apiDate);
+    setSelectedDateOperations(ops);
+    console.log('Received operations:', ops);
+    
     // Reset filters when opening popup
     setFilter({
       status: 'all',
       phase: 'all',
-      date: operation.date
+      date: apiDate
     });
   };
 
   // Filter operations for main table
-  const filteredOperations = operationsJournal.filter(item => {
+  const filteredOperations = operationsData.filter(item => {
+    const formattedDate = item.date;
     const matchesDate = filter.date === 'all' || 
-                      (filter.date === item.date) || 
+                      (filter.date === formattedDate) || 
                       (selectedFilterDate && item.dateObj.toDateString() === selectedFilterDate.toDateString());
     const matchesStatus = filter.status === 'all' || item.statusType === filter.status;
     const matchesPhase = filter.phase === 'all' || item.phase === filter.phase;
     return matchesDate && matchesStatus && matchesPhase;
   });
 
-  // Filter daily operations for popup
-  const filteredDailyOperations = dailyOperations[selectedDate]?.filter(item => {
-    const matchesStatus = filter.status === 'all' || item.statusType === filter.status;
-    return matchesStatus;
-  }) || [];
-
   // Handle date selection from calendar
   const handleDateSelect = (date) => {
     // Find matching date in the data
-    const matchingDate = operationsJournal.find(item => 
+    const matchingDate = operationsData.find(item => 
       item.dateObj.toDateString() === date.toDateString()
-    )?.date || format(date, 'MMM d, yyyy', { locale: fr });
+    );
     
-    setFilter({...filter, date: matchingDate});
+    const formattedDate = matchingDate ? matchingDate.date : format(date, 'yyyy-MM-dd');
+    
+    setFilter({...filter, date: formattedDate});
     setSelectedFilterDate(date);
     setShowDatePicker(false);
   };
@@ -299,10 +345,38 @@ const DetailDelais = () => {
   );
 
   // Get unique phases and dates for filter dropdowns
-  const uniquePhases = [...new Set(operationsJournal.map(item => item.phase))];
-  const uniqueDates = [...new Set(operationsJournal.map(item => item.date))];
+  const uniquePhases = [...new Set(operationsData.map(item => item.phase))];
+  const uniqueDates = [...new Set(operationsData.map(item => item.date))];
 
-  return (
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F6F6F6] font-sans p-6 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#7C8DB5]"></div>
+          <p className="mt-2 text-gray-600">Chargement des données...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F6F6F6] font-sans p-6 flex items-center justify-center">
+        <div className="bg-white rounded-lg p-6 shadow-md max-w-md">
+          <h2 className="text-xl font-bold text-red-500 mb-2">Erreur</h2>
+          <p className="text-gray-700 mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-[#7C8DB5] text-white px-4 py-2 rounded-lg hover:bg-[#6a7aa1] transition-colors"
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+ return (
     <div className="min-h-screen bg-[#F6F6F6] font-sans p-6">
       {/* Main Container with rounded corners and centered content */}
       <motion.div 
@@ -335,7 +409,7 @@ const DetailDelais = () => {
 
         {/* Main Content */}
         <main className="p-6">
-          {/* Summary Cards */}
+          {/* Summary Cards - Now with dynamic data */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[10px] mb-8 bg-white rounded-lg shadow-sm">
             {summaryData.map((item, index) => (
               <motion.div 
@@ -355,7 +429,7 @@ const DetailDelais = () => {
 
           <div className="border-t border-gray-200 my-6"></div>
 
-          {/* Filter Section - Styled with white divs and floating effect */}
+          {/* Filter Section */}
           <div className="flex flex-wrap gap-4 mb-6">
             {/* Date filter */}
             <motion.div 
@@ -512,11 +586,11 @@ const DetailDelais = () => {
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Phase</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Depth @ 24h (ft)</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">PROGRESS (ft)</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NPT (h)</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cumulative NPT</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut délai</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Profondeur</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progrès</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NPT Journalier</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NPT Cumulé</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut Global</th>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Détails</th>
                   </tr>
                 </thead>
@@ -531,7 +605,7 @@ const DetailDelais = () => {
                         transition={{ duration: 0.3 }}
                       >
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                          {item.date}
+                          {item.displayDate}
                         </td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.phase}</td>
                         <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.depth}</td>
@@ -588,7 +662,7 @@ const DetailDelais = () => {
               <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
                   <h2 className="text-2xl font-bold text-gray-800">
-                    Journal des Opérations du {selectedDate}
+                    Opérations pour la date : {selectedDate}
                   </h2>
                   <motion.button 
                     onClick={() => setShowPopup(false)}
@@ -600,60 +674,6 @@ const DetailDelais = () => {
                   </motion.button>
                 </div>
 
-                {/* Filter buttons - Styled with white divs and floating effect */}
-                <div className="flex flex-wrap gap-4 mb-6">
-                  {/* Status filter */}
-                  <motion.div 
-                    className="bg-white rounded-lg shadow-md p-2"
-                    whileHover={{ y: -2 }}
-                    transition={{ type: "spring", stiffness: 300 }}
-                  >
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm text-gray-600">Statut:</span>
-                      <div className="relative">
-                        <select
-                          value={filter.status}
-                          onChange={(e) => setFilter({...filter, status: e.target.value})}
-                          className="appearance-none w-40 pl-3 pr-8 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#7C8DB5] focus:border-[#7C8DB5] transition-all duration-200 hover:border-[#7C8DB5]"
-                        >
-                          <option value="all">Tous les statuts</option>
-                          <option value="controlled">Sous contrôle</option>
-                          <option value="warning">À surveiller</option>
-                          <option value="exceeded">Dépassement</option>
-                        </select>
-                        <div className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-                          <ChevronDown />
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Quick filter buttons */}
-                  <motion.div 
-                    className="flex items-center space-x-2"
-                    layout
-                  >
-                    <FilterButton 
-                      active={filter.status === 'all'}
-                      onClick={() => setFilter({...filter, status: 'all'})}
-                    >
-                      Tous
-                    </FilterButton>
-                    <FilterButton 
-                      active={filter.status === 'controlled'}
-                      onClick={() => setFilter({...filter, status: 'controlled'})}
-                    >
-                      Sous contrôle
-                    </FilterButton>
-                    <FilterButton 
-                      active={filter.status === 'exceeded'}
-                      onClick={() => setFilter({...filter, status: 'exceeded'})}
-                    >
-                      Dépassement
-                    </FilterButton>
-                  </motion.div>
-                </div>
-
                 <motion.div 
                   className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200"
                   whileHover={{ boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)" }}
@@ -662,16 +682,16 @@ const DetailDelais = () => {
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timing (h)</th>
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut délai</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure Début</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heure Fin</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Opération</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Durée PR</th>
+                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {filteredDailyOperations.length > 0 ? (
-                          filteredDailyOperations.map((item, index) => (
+                        {selectedDateOperations.length > 0 ? (
+                          selectedDateOperations.map((item, index) => (
                             <motion.tr 
                               key={index} 
                               className="hover:bg-gray-50"
@@ -679,19 +699,19 @@ const DetailDelais = () => {
                               animate={{ opacity: 1 }}
                               transition={{ duration: 0.3 }}
                             >
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.no}</td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.id}</td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.name}</td>
-                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.timing}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.startTime || 'N/A'}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.endTime || 'N/A'}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">{item.operation || 'N/A'}</td>
+                              <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{item.duration || 'N/A'}</td>
                               <td className="px-4 py-3 whitespace-nowrap">
-                                <StatusIndicator type={item.statusType} status={item.status} />
+                                <PopupStatusIndicator status={item.status} />
                               </td>
                             </motion.tr>
                           ))
                         ) : (
                           <tr>
                             <td colSpan="5" className="px-4 py-3 text-center text-sm text-gray-500">
-                              Aucune opération trouvée avec les filtres sélectionnés
+                              Aucune opération trouvée pour cette date
                             </td>
                           </tr>
                         )}

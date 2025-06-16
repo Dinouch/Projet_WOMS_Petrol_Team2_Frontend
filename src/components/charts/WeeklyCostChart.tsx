@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -21,13 +22,43 @@ ChartJS.register(
   Legend
 );
 
-const WeeklyCostChart: React.FC = () => {
-  const data = {
-    labels: ['Sem1', 'Sem2', 'Sem3', 'Sem4', 'Sem5', 'Sem6'],
+const WeeklyCostChart = () => {
+  const [weeklyLabels, setWeeklyLabels] = useState<string[]>([]);
+  const [weeklyData, setWeeklyData] = useState<number[]>([]);
+
+  useEffect(() => {
+    const fetchWeeklyCosts = async () => {
+      try {
+        const response = await axios.get(
+          'http://localhost:8090/test_j2ee/analyseCouts?action=sommeParSemaine&nomPuit=A'
+        );
+
+        if (response.data && response.data.data) {
+          const labels: string[] = [];
+          const data: number[] = [];
+
+          response.data.data.forEach((item: any) => {
+            labels.push(`Sem${item.semaineRelative + 1}`);
+            data.push(parseFloat(item.sommeReel));
+          });
+
+          setWeeklyLabels(labels);
+          setWeeklyData(data);
+        }
+      } catch (error) {
+        console.error('Erreur lors du chargement des données hebdomadaires:', error);
+      }
+    };
+
+    fetchWeeklyCosts();
+  }, []);
+
+  const chartData = {
+    labels: weeklyLabels,
     datasets: [
       {
         label: 'Coûts hebdomadaires',
-        data: [15000, 22000, 18000, 28000, 21000, 25000],
+        data: weeklyData,
         borderColor: '#a5b4fc',
         backgroundColor: '#a5b4fc',
         pointBackgroundColor: 'white',
@@ -44,9 +75,7 @@ const WeeklyCostChart: React.FC = () => {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
         backgroundColor: 'white',
         titleColor: '#333',
@@ -60,9 +89,7 @@ const WeeklyCostChart: React.FC = () => {
     },
     scales: {
       x: {
-        grid: {
-          display: false,
-        },
+        grid: { display: false },
       },
       y: {
         display: false,
@@ -79,7 +106,7 @@ const WeeklyCostChart: React.FC = () => {
     <div className="bg-white p-6 rounded-lg shadow-sm h-full">
       <h3 className="text-lg font-medium text-purple-300 mb-4">Coûts hebdomadaires</h3>
       <div className="h-48">
-        <Line data={data} options={options} />
+        <Line data={chartData} options={options} />
       </div>
     </div>
   );

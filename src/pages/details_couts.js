@@ -1,114 +1,50 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const DetailCouts = () => {
   // State for summary cards data
-  const [summaryData] = useState([
+  const [summaryData, setSummaryData] = useState([
     {
       title: "Total coûts",
-      value: "9,5M $",
-      change: "10.2 +1.01% this week",
+      value: "0.00 $",
+      change: "0.00% this week",
       changePositive: true
     },
     {
       title: "Total prevu reste",
-      value: "0,5M $",
-      change: "31 -7.49% this week",
+      value: "0.00 $",
+      change: "0.00% this week",
       changePositive: false
     },
     {
       title: "Total non prevu",
-      value: "0M $",
-      change: "2.56 -0.91% this week",
+      value: "0.00 $",
+      change: "0.00% this week",
       changePositive: false
     },
     {
       title: "prevision",
-      value: "11,6M $",
-      change: "7.2 +1.51% this week",
+      value: "0.00 $",
+      change: "0.00% this week",
       changePositive: true
     }
   ]);
 
+  // State for global stats
+  const [globalStats, setGlobalStats] = useState({
+    statutGlobal: "Vert",
+    totalReel: "0.00",
+    totalPrevuReste: "0.00",
+    totalNonPrevu: "0.00",
+    budgetPrevisionnel: "0.00",
+    pourcentageConsomme: "0.00"
+  });
+
   // State for cost journal data
-  const [costJournal] = useState([
-    {
-      id: "#12594",
-      date: "Dec 1, 2021",
-      operation: "Operation X",
-      phase: "Phase 26\"",
-      realCost: "$500.00",
-      plannedCost: "$497.69",
-      status: "Sous contrôle",
-      statusType: "controlled",
-      details: "**"
-    },
-    {
-      id: "#12490",
-      date: "Nov 15, 2021",
-      operation: "Operation Y",
-      phase: "Phase 12 1/4",
-      realCost: "$674.00",
-      plannedCost: "$679.14",
-      status: "À surveiller",
-      statusType: "warning",
-      details: "**"
-    },
-    {
-      id: "#12306",
-      date: "Nov 2, 2021",
-      operation: "Operation A",
-      phase: "Phase 16\"",
-      realCost: "$1000.00",
-      plannedCost: "$1237.14",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    },
-    {
-      id: "#12306",
-      date: "Nov 2, 2021",
-      operation: "Operation C",
-      phase: "Phase 8 1/2",
-      realCost: "$850.00",
-      plannedCost: "$777.14",
-      status: "Sous contrôle",
-      statusType: "controlled",
-      details: "**"
-    },
-    {
-      id: "#12306",
-      date: "Nov 2, 2021",
-      operation: "Operation E",
-      phase: "Phase 16\"",
-      realCost: "$380.00",
-      plannedCost: "$477.14",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    },
-    {
-      id: "#12306",
-      date: "Nov 2, 2021",
-      operation: "Operation P",
-      phase: "Phase 26\"",
-      realCost: "$574.00",
-      plannedCost: "$677.00",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    },
-    {
-      id: "#12306",
-      date: "Nov 2, 2021",
-      operation: "Operation F",
-      phase: "Phase 26\"",
-      realCost: "$400.00",
-      plannedCost: "$543.14",
-      status: "Dépassement",
-      statusType: "exceeded",
-      details: "**"
-    }
-  ]);
+  const [costJournal, setCostJournal] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [dailyOperations, setDailyOperations] = useState([]);
 
   // State for popup
   const [selectedDate, setSelectedDate] = useState(null);
@@ -116,12 +52,79 @@ const DetailCouts = () => {
   const [statusFilter, setStatusFilter] = useState('all');
   const [phaseFilter, setPhaseFilter] = useState('all');
 
+  // Fetch data from APIs
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // Fetch global stats
+        const statsResponse = await axios.get('http://localhost:8090/test_j2ee/analyseCouts?action=statistiquesGlobales&nomPuit=A');
+        if (statsResponse.data.success) {
+          setGlobalStats(statsResponse.data);
+          
+          // Update summary cards with real data
+          setSummaryData([
+            {
+              title: "Total coûts",
+              value: `${(parseFloat(statsResponse.data.totalReel) / 1000000).toFixed(2)}M $`,
+              change: "10.2 +1.01% this week",
+              changePositive: true
+            },
+            {
+              title: "Total prevu reste",
+              value: `${(parseFloat(statsResponse.data.totalPrevuReste) / 1000000).toFixed(2)}M $`,
+              change: "31 -7.49% this week",
+              changePositive: false
+            },
+            {
+              title: "Total non prevu",
+              value: `${(parseFloat(statsResponse.data.totalNonPrevu) / 1000000).toFixed(2)}M $`,
+              change: "2.56 -0.91% this week",
+              changePositive: false
+            },
+            {
+              title: "prevision",
+              value: `${(parseFloat(statsResponse.data.budgetPrevisionnel) / 1000000).toFixed(2)}M $`,
+              change: "7.2 +1.51% this week",
+              changePositive: true
+            }
+          ]);
+        }
+
+        // Fetch cost journal data
+        const journalResponse = await axios.get('http://localhost:8090/test_j2ee/importCoutOpr?nomPuit=A');
+        if (journalResponse.data.success) {
+          const transformedData = journalResponse.data.data.map(item => ({
+            id: "#" + Math.floor(10000 + Math.random() * 90000),
+            date: new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+            originalDate: item.date,
+            operation: "Operation " + String.fromCharCode(65 + Math.floor(Math.random() * 26)),
+            phase: item.phase,
+            realCost: "$" + parseFloat(item.sommeReel).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            plannedCost: "$" + parseFloat(item.sommePrevu).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+            status: item.statutCout,
+            statusType: item.statutCout === "Sous contrôle" ? "controlled" : 
+                        item.statutCout === "À surveiller" ? "warning" : "exceeded",
+            details: "**"
+          }));
+          setCostJournal(transformedData);
+        } else {
+          setError("Failed to fetch data from API");
+        }
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   // Filter operations by selected date and filters
-  const filteredOperations = costJournal.filter(item => {
-    const matchesDate = item.date === selectedDate;
+  const filteredOperations = dailyOperations.filter(item => {
     const matchesStatus = statusFilter === 'all' || item.statusType === statusFilter;
     const matchesPhase = phaseFilter === 'all' || item.phase === phaseFilter;
-    return matchesDate && matchesStatus && matchesPhase;
+    return matchesStatus && matchesPhase;
   });
 
   // Get unique phases for filter dropdown
@@ -153,19 +156,59 @@ const DetailCouts = () => {
   );
 
   // Handle details click
-  const handleDetailsClick = (operation) => {
-    setSelectedDate(operation.date);
+  const handleDetailsClick = async (item) => {
+    setSelectedDate(item.date);
     setShowPopup(true);
-    // Reset filters when opening popup
-    setStatusFilter('all');
-    setPhaseFilter('all');
+    
+    const apiDate = item.originalDate;
+    
+    try {
+      const response = await axios.get(`http://localhost:8090/test_j2ee/operationsByPuitAndDate?nomPuit=A&date=${apiDate}`);
+      if (response.data && response.data.operations) {
+        const transformed = response.data.operations.map((op, index) => ({
+          id: "#" + (10000 + index),
+          operation: op.nomOperation || "N/A",
+          phase: op.phase || "N/A",
+          realCost: op.coutReel !== "null" ? `$${parseFloat(op.coutReel).toLocaleString()}` : "N/A",
+          plannedCost: op.coutPrevu !== "null" ? `$${parseFloat(op.coutPrevu).toLocaleString()}` : "N/A",
+          status: op.statutCout !== "null" ? op.statutCout : "Non défini",
+          statusType: op.statutCout === "Sous contrôle" ? "controlled" : 
+                      op.statutCout === "À surveiller" ? "warning" : 
+                      op.statutCout === "Dépassement" ? "exceeded" : "warning"
+        }));
+        setDailyOperations(transformed);
+      } else {
+        setDailyOperations([]);
+      }
+    } catch (error) {
+      console.error("Erreur lors du chargement des opérations par date :", error);
+      setDailyOperations([]);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#F6F6F6] font-sans p-6 flex items-center justify-center">
+        <div className="bg-white rounded-[30px] shadow-sm max-w-7xl w-full p-6 text-center">
+          <p>Loading data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-[#F6F6F6] font-sans p-6 flex items-center justify-center">
+        <div className="bg-white rounded-[30px] shadow-sm max-w-7xl w-full p-6 text-center text-red-500">
+          <p>Error: {error}</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#F6F6F6] font-sans p-6">
-      {/* Main Container with rounded corners and centered content */}
       <div className="bg-white rounded-[30px] shadow-sm max-w-7xl mx-auto p-6">
-        {/* Navbar */}
         <header className="bg-white border-b border-gray-200 rounded-t-lg">
           <div className="flex justify-between items-center px-6 py-3">
             <div className="flex items-center space-x-4">
@@ -182,9 +225,8 @@ const DetailCouts = () => {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="p-6">
-          {/* Summary Cards */}
+          {/* Summary Cards with real data */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-[10px] mb-8 bg-white rounded-lg shadow-sm">
             {summaryData.map((item, index) => (
               <div 
@@ -266,9 +308,7 @@ const DetailCouts = () => {
                 </button>
               </div>
 
-              {/* Filter buttons */}
               <div className="flex flex-wrap gap-4 mb-6">
-                {/* Status filter */}
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">Statut:</span>
                   <div className="inline-flex rounded-md shadow-sm" role="group">
@@ -303,7 +343,6 @@ const DetailCouts = () => {
                   </div>
                 </div>
 
-                {/* Phase filter */}
                 <div className="flex items-center space-x-2">
                   <span className="text-sm text-gray-600">Phase:</span>
                   <select
