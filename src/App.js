@@ -60,7 +60,7 @@ function App() {
                 <Route path="/ganttChart" element={<GanttChart />} />
                 <Route path="/ganttChartmng" element={<GanttChartMng />} />
                 <Route path="/Acceuil" element={<Accueil />} />
-                <Route path="/puit" element={<Puit />} />
+                <Route path="/puit/:id" element={<Puit />} />
                 <Route path="/details_couts" element={<DetailCouts />} />
                 <Route path="/details_delai" element={<DetailDelais />} />
                 <Route path="/Acceuil_ingenieur" element={<DrillingParameters />} />

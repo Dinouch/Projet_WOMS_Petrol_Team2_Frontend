@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement } from 'chart.js';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import {
   LineChart,
@@ -16,6 +16,7 @@ import {
 ChartJS.register(ArcElement);
 
 const Puit = () => {
+    const { id } = useParams();
     const navigate = useNavigate();
     const [costData, setCostData] = useState({
         statutGlobal: "Vert",
@@ -31,14 +32,21 @@ const Puit = () => {
         totalNonPrevu: 0
     });
 
+    const [puitInfo, setPuitInfo] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Fetch puit info
+                const puitResponse = await axios.get(
+                    `http://localhost:8090/test_j2ee/puits/${id}`
+                );
+                setPuitInfo(puitResponse.data);
+
                 // Fetch cost data
                 const costResponse = await axios.get(
-                    'http://localhost:8090/test_j2ee/analyseCouts?action=statistiquesGlobales&nomPuit=A'
+                    `http://localhost:8090/test_j2ee/analyseCouts?action=statistiquesGlobales&nomPuit=A`
                 );
                 if (costResponse.data.success) {
                     setCostData({
@@ -50,7 +58,7 @@ const Puit = () => {
 
                 // Fetch delai data
                 const delaiResponse = await axios.get(
-                    'http://localhost:8090/test_j2ee/analyseDelais?action=statistiquesGlobales&nomPuit=A'
+                    `http://localhost:8090/test_j2ee/analyseDelais?action=statistiquesGlobales&nomPuit=A`
                 );
                 if (delaiResponse.data.success) {
                     setDelaiData({
@@ -69,9 +77,8 @@ const Puit = () => {
             }
         };
         fetchData();
-    }, []);
+    }, [id]);
 
-    // Couleur dynamique pour les coûts
     const getCostColor = () => {
         switch(costData.statutGlobal) {
             case "Vert": return "#268F00";
@@ -81,7 +88,6 @@ const Puit = () => {
         }
     };
 
-    // Couleur dynamique pour les délais
     const getDelaiColor = () => {
         switch(delaiData.statutGlobalDelai) {
             case "Vert": return "#268F00";
@@ -91,7 +97,6 @@ const Puit = () => {
         }
     };
 
-    // Texte de statut dynamique pour les coûts
     const getCostStatusText = () => {
         switch(costData.statutGlobal) {
             case "Vert": return "Excellent";
@@ -101,7 +106,6 @@ const Puit = () => {
         }
     };
 
-    // Texte de statut dynamique pour les délais
     const getDelaiStatusText = () => {
         switch(delaiData.statutGlobalDelai) {
             case "Vert": return "Excellent";
@@ -111,7 +115,6 @@ const Puit = () => {
         }
     };
 
-    // Formatage du montant (ex: 1600000 → "1.6 M Dzd")
     const formatMontant = (montant) => {
         const num = parseFloat(montant);
         if (num >= 1000000) return `${(num / 1000000).toFixed(1)} M Dzd`;
@@ -119,7 +122,6 @@ const Puit = () => {
         return `${num.toFixed(2)} Dzd`;
     };
 
-    // Calcul du pourcentage de progression pour le délai
     const getDelaiPercentage = () => {
         return (delaiData.nbrJourX / 120) * 100;
     };
@@ -128,21 +130,28 @@ const Puit = () => {
         <div className="p-6 bg-gray-50 min-h-screen">
             <div className="bg-white p-6 rounded-xl shadow">
                 <div className="flex justify-between items-center mb-10">
-                    <h1 className="text-2xl font-bold" style={{ color: '#FF8A66' }}>Détails par puit</h1>
+                    <h1 className="text-2xl font-bold" style={{ color: '#FF8A66' }}>
+                        {puitInfo ? `Puit ${puitInfo.nom_puit} #${puitInfo.id_puit}` : 'Détails par puit'}
+                    </h1>
                     <button className="border border-gray-300 text-[#2C5378] px-4 py-2 rounded-lg shadow-sm hover:bg-gray-100">
                         Sélectionner un puit
                     </button>
                 </div>
                 
                 <div className="flex flex-col md:flex-row gap-8">
-                    {/* Colonne gauche inchangée */}
                     <div className="md:w-2/5">
-                        <h2 className="text-lg font-semibold mb-2">Puit d'Adrar #03002 :</h2>
+                        <h2 className="text-lg font-semibold mb-2">
+                            {puitInfo ? `Puit ${puitInfo.nom_puit} #${puitInfo.id_puit}` : 'Chargement...'}
+                        </h2>
                         <p className="text-gray-700 mb-4">
-                            Le puits d'Adrar atteint 300m de profondeur<br />
-                            avec plusieurs tubages. Il contient de la<br />
-                            saumure et vise les objectifs Dv3, Dv2, Dv1,<br />
-                            Ord2 et Ord1.
+                            {puitInfo ? (
+                                <>
+                                    Le puits de {puitInfo.zone.wilaya} atteint {puitInfo.zone.elevation}m de profondeur<br />
+                                    avec plusieurs tubages. Il contient de la<br />
+                                    saumure et vise les objectifs Dv3, Dv2, Dv1,<br />
+                                    Ord2 et Ord1.
+                                </>
+                            ) : 'Chargement des informations...'}
                         </p>
 
                         <div className="flex space-x-20 mb-5">
@@ -170,11 +179,12 @@ const Puit = () => {
                         </div>
                     </div>
 
-                    {/* Colonne droite avec le graphique de profondeur */}
                     <div className="md:w-3/5">
                         <div className="mb-11">
                             <div className="text-center mb-2">
-                                <p className="text-2xl font-bold">300m</p>
+                                <p className="text-2xl font-bold">
+                                    {puitInfo ? `${puitInfo.zone.elevation}m` : '0m'}
+                                </p>
                                 <p className="text-sm text-gray-500">Votre profondeur totale actuelle</p>
                             </div>
 
@@ -200,9 +210,7 @@ const Puit = () => {
                             </ResponsiveContainer>
                         </div>
 
-                        {/* Section Cost Performance et Délai Performance */}
                         <div className="flex gap-4 h-1/2">
-                            {/* Cost Performance */}
                             <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col w-full border border-gray-300">
                                 <div className="text-center mb-3">
                                     <p className="text-sm font-bold" style={{ color: '#2E2E30' }}>Cost Performance</p>
@@ -221,7 +229,7 @@ const Puit = () => {
                                     )}
                                 </div>
                                 <button 
-                                    onClick={() => navigate('/details_couts')}
+                                    onClick={() => navigate(`/details_couts`)}
                                     className="border border-gray-300 rounded-md px-14 py-2 text-sm font-bold self-center mt-2" 
                                     style={{ color: '#8A8A8A' }}
                                 >
@@ -229,7 +237,6 @@ const Puit = () => {
                                 </button>
                             </div>
 
-                            {/* Délai Performance avec données dynamiques */}
                             <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col w-full border border-gray-300">
                                 <div className="text-center mb-3">
                                     <p className="text-sm font-bold" style={{ color: '#2E2E30' }}>Délai Performance</p>
@@ -248,7 +255,7 @@ const Puit = () => {
                                     )}
                                 </div>
                                 <button
-                                    onClick={() => navigate('/details_delai')}
+                                    onClick={() => navigate(`/details_delai`)}
                                     className="border border-gray-300 rounded-md px-14 py-2 text-sm font-bold self-center mt-2" 
                                     style={{ color: '#8A8A8A' }}
                                 >
@@ -263,7 +270,6 @@ const Puit = () => {
     );
 };
 
-// Composant CircleChart inchangé
 const CircleChart = ({ value, color, centerText, icon, remarque }) => {
     const filled = parseFloat(value);
     const chartData = {
@@ -319,7 +325,6 @@ const CircleChart = ({ value, color, centerText, icon, remarque }) => {
     );
 };
 
-// Données pour le graphique de profondeur inchangées
 const data = [
     { date: "1 jan", depth: 50 },
     { date: "2 jan", depth: 120 },
