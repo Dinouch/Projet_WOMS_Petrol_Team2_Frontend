@@ -56,10 +56,10 @@ export default function MirroredRectangles() {
         <div className="flex">
           {/* Rectangles verts collés */}
           <div className="flex flex-row items-start">
-            <div className="bg-green-400 border border-black flex flex-col justify-end" style={{width: `${widths.vertical}px`, height: `${heights.large}px`}}>
+            <div className=" border  flex flex-col justify-end" style={{width: `${widths.vertical}px`, height: `${heights.large}px`}}>
                             <div className="bg-black border border-black ml-[-37px]" style={{width: `${widths.horizontal-12}px`, height: `${connectorThickness+3}px`}}></div>
             </div>
-            <div className="bg-green-400 border border-black" style={{width: `${widths.vertical}px`, height: `${heights.medium}px`}}></div>
+            <div className=" border-black" style={{width: `${widths.vertical}px`, height: `${heights.medium}px`}}></div>
             <div className="bg-green-400 border border-black " style={{width: `${widths.vertical}px`, height: `${heights.small}px`}}></div>
           </div>
           
@@ -107,13 +107,13 @@ export default function MirroredRectangles() {
         {/* Côté droit - effet miroir en vert */}
         <div className="flex flex-col space-y-5 mb-8">
           <div className="flex items-center" id="connector-end-1">
-            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+            <div className="" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
           <div className="flex items-center" id="connector-end-2">
-            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+            <div className="" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
           <div className="flex items-center" id="connector-end-3">
-            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+            <div className="" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
         </div>
       </div>
@@ -139,10 +139,10 @@ export default function MirroredRectangles() {
         {/* Côté droit - effet miroir en vert */}
         <div className="flex flex-col space-y-5 mt-1">
           <div className="flex items-center">
-            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+            <div className="" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
           <div className="flex items-center">
-            <div className="bg-green-400 border border-black" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
+            <div className="" style={{width: `${widths.horizontal}px`, height: `${heights.horizontal}px`}}></div>
           </div>
         </div>
       </div>

@@ -25,10 +25,10 @@ const SidebarIng: React.FC = () => {
       <nav className="flex-1 p-4 space-y-3"> {/* Espacement augmenté */}
         {/* Accueil */}
         <NavItem 
-          to="/puit" 
+          to="/acceuil" 
           icon={<Home size={20} />} 
           label="Accueil" 
-          isActive={location.pathname === '/puit'} 
+          isActive={location.pathname === '/acceuil'} 
         />
         
         {/* Coûts */}

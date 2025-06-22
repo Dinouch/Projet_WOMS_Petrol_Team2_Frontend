@@ -297,7 +297,7 @@ const DrillingReportForm = () => {
     console.log("Form submitted:", formData);
     setShowSuccess(true);
     setTimeout(() => {
-      navigate('/puit');
+      navigate('/acceuil');
     }, 3000);
   };
 

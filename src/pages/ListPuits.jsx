@@ -1,21 +1,23 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Truck, Calendar, Users, FileText, Building, DollarSign, Bell, Plus, Edit3, X } from 'lucide-react';
-
+import puitop from '../photos/puitop.png'
 const ListPuits = () => {
   const mapRef = useRef(null);
   const [selectedWell, setSelectedWell] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+   const navigate = useNavigate();
 
   // Données des puits pétroliers avec ingénieurs
   const wells = [
-    { id: 1, name: 'Hassi Messaoud', status: 'active', production: '850k bbl/day', operator: 'Sonatrach', region: 'Ouargla', discovered: '1956', engineer: 'Ahmed Benaissa' },
-    { id: 2, name: 'Hassi R\'Mel', status: 'active', production: '2.8 bcf/day', operator: 'Sonatrach', region: 'Laghouat', discovered: '1961', engineer: 'Fatima Khelifi' },
-    { id: 3, name: 'In Amenas', status: 'maintenance', production: '500k bbl/day', operator: 'BP-Sonatrach', region: 'Illizi', discovered: '2002', engineer: 'Mohamed Larbi' },
-    { id: 4, name: 'In Salah', status: 'active', production: '300k bbl/day', operator: 'BP-Sonatrach', region: 'Tamanrasset', discovered: '1989', engineer: 'Amina Boudjemaa' },
-    { id: 5, name: 'Ourhoud', status: 'active', production: '400k bbl/day', operator: 'Sonatrach', region: 'Ouargla', discovered: '1994', engineer: 'Karim Meziani' },
-    { id: 6, name: 'Berkine', status: 'inactive', production: '200k bbl/day', operator: 'Sonatrach', region: 'Ouargla', discovered: '2008', engineer: 'Sarah Hamidi' },
-    { id: 7, name: 'Tin Fouye Tabankort', status: 'active', production: '180k bbl/day', operator: 'Eni-Sonatrach', region: 'Illizi', discovered: '2004', engineer: 'Omar Bencheikh' },
-    { id: 8, name: 'Menzel Ledjmet', status: 'active', production: '120k bbl/day', operator: 'Sonatrach', region: 'Ouargla', discovered: '1999', engineer: 'Nadia Zerrouki' }
+    { id: 1, name: 'A', status: 'active', profondeur: '89', operator: 'Sonatrach', region: 'Adrar', discovered: '1956', engineer: 'TAIBI Ryad' },
+    { id: 2, name: 'B', status: 'active', profondeur: '100', operator: 'Sonatrach', region: 'Adrar', discovered: '1961', engineer: 'Fatima Khelifi' },
+    { id: 3, name: 'In Amenas', status: 'maintenance', profondeur: '52', operator: 'BP-Sonatrach', region: 'Illizi', discovered: '2002', engineer: 'Mohamed Larbi' },
+    { id: 4, name: 'In Salah', status: 'active', profondeur: '67', operator: 'BP-Sonatrach', region: 'Tamanrasset', discovered: '1989', engineer: 'Amina Boudjemaa' },
+    { id: 5, name: 'Ourhoud', status: 'active', profondeur: '95', operator: 'Sonatrach', region: 'Ouargla', discovered: '1994', engineer: 'Karim Meziani' },
+    { id: 6, name: 'Berkine', status: 'inactive', profondeur: '31', operator: 'Sonatrach', region: 'Ouargla', discovered: '2008', engineer: 'Sarah Hamidi' },
+    { id: 7, name: 'Tin Fouye Tabankort', status: 'active', profondeur: '168', operator: 'Eni-Sonatrach', region: 'Illizi', discovered: '2004', engineer: 'Omar Bencheikh' },
+    { id: 8, name: 'Menzel Ledjmet', status: 'active', profondeur: '210', operator: 'Sonatrach', region: 'Ouargla', discovered: '1999', engineer: 'Nadia Zerrouki' }
   ];
 
   // Filtrage des puits basé sur la recherche
@@ -187,8 +189,8 @@ const ListPuits = () => {
 
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-500">Production:</span>
-                      <span className="font-medium text-gray-900">{well.production}</span>
+                      <span className="text-gray-500">Progression:</span>
+                      <span className="font-medium text-gray-900">{well.profondeur} ft</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-500">Ingénieur:</span>
@@ -243,8 +245,8 @@ const ListPuits = () => {
                   <h5 className="font-semibold text-gray-900 mb-4 text-lg">Informations Techniques</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="bg-white rounded-lg p-4">
-                      <span className="text-gray-600 text-sm">Production</span>
-                      <div className="font-bold text-xl text-orange-600">{selectedWell.production}</div>
+                      <span className="text-gray-600 text-sm">Progression</span>
+                      <div className="font-bold text-xl text-orange-600">{selectedWell.profondeur} ft</div>
                     </div>
                     <div className="bg-white rounded-lg p-4">
                       <span className="text-gray-600 text-sm">Découvert</span>
@@ -270,30 +272,22 @@ const ListPuits = () => {
                 {/* Carte du puits sélectionné */}
                 <div className="bg-white rounded-lg border border-orange-200 p-4">
                   <h5 className="font-medium text-gray-900 mb-3 flex items-center">
-                    <MapPin className="w-4 h-4 text-orange-500 mr-2" />
-                    Localisation
+                    Progression
                   </h5>
-                  <div ref={mapRef} className="w-full h-64 bg-gray-100 rounded-lg"></div>
-                  <div className="text-xs text-gray-500 mt-2 text-center">
-                    Carte centrée sur {selectedWell.name}
-                  </div>
+                  <img 
+                      src={puitop}
+                      alt="Logo WOMS" 
+                      className="h-[70%] w-[70%]" // Ajustez la taille selon vos besoins
+                    />
+                    <div className="h-10 w-[70%]"> </div>
+                  <button 
+  onClick={() => navigate('/puit/1')}
+  class="align-sub px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-xl shadow-md transition duration-300"
+>
+  Voir plus de détails
+</button>
                 </div>
 
-                {/* Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                  <button className="bg-orange-500 text-white py-3 px-4 rounded-lg hover:bg-orange-600 transition-colors font-medium">
-                    Voir Rapports de Production
-                  </button>
-                  <button className="border border-orange-300 text-orange-700 py-3 px-4 rounded-lg hover:bg-orange-50 transition-colors font-medium">
-                    Historique Maintenance
-                  </button>
-                  <button className="border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                    Contacter l'Ingénieur
-                  </button>
-                  <button className="border border-gray-300 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-50 transition-colors font-medium">
-                    Télécharger Données
-                  </button>
-                </div>
               </div>
             </div>
           </div>

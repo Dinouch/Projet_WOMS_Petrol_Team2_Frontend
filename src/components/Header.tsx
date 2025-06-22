@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Bell, Settings, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import logowoms from '../photos/womslogo.png';
 
 const Header: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -23,7 +24,12 @@ const Header: React.FC = () => {
   return (
     <header className="bg-white border-b border-gray-200 py-4 px-6 flex items-center justify-between">
       <div className="flex items-center text-gray-500 gap-8">
-        <span>WOMS App</span>
+        <img 
+    src={logowoms}
+    alt="Logo WOMS" 
+    className="h-8 w-auto" // Ajustez la taille selon vos besoins
+  />
+        <span>WOMS-PRISM</span>
         <span>{formattedDate}</span>
       </div>
       

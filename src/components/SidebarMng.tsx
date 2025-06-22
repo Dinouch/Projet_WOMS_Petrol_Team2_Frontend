@@ -25,26 +25,26 @@ const SidebarMng: React.FC = () => {
       <nav className="flex-1 p-4 space-y-3"> {/* Espacement augmenté */}
         {/* Accueil */}
         <NavItem 
-          to="/Acceuil" 
+          to="/listpuit" 
           icon={<Home size={20} />} 
           label="Accueil" 
-          isActive={location.pathname === '/Acceuil'} 
+          isActive={location.pathname === '/listpuit'} 
         />
         
         {/* Coûts */}
         <NavItem 
-          to="/dashboard" 
+          to="/details_couts" 
           icon={<DollarSign size={20} />} 
           label="Coûts" 
-          isActive={location.pathname === '/dashboard'} 
+          isActive={location.pathname === '/details_couts'} 
         />
         
         {/* Délais */}
         <NavItem 
-          to="/ganttChartmng" 
+          to="/ganttChart" 
           icon={<Clock size={20} />} 
           label="Délais" 
-          isActive={location.pathname === '/ganttChartmng'} 
+          isActive={location.pathname === '/ganttChart'} 
         />
         
         {/* Dashboard Global */}

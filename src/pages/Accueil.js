@@ -306,11 +306,11 @@ const Accueil = () => {
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <p className="text-xs text-gray-500">Total problèmes</p>
-                    <p className="text-lg font-bold text-red-500">{puitsData[selectedPuit].problems}</p>
+                    <p className="text-lg font-bold text-red-500">09</p>
                   </div>
                   <CircleChart
                     data={createChartData(puitsData[selectedPuit].problems, 20, '#ef4444')}
-                    value={puitsData[selectedPuit].problems}
+                    value= '09'
                     color="#ef4444"
                   />
                 </div>
@@ -328,7 +328,7 @@ const Accueil = () => {
               <div className="bg-white p-4 rounded-lg shadow-sm flex flex-col">
                 <div className="flex items-center justify-between mb-2">
                   <div>
-                    <p className="text-xs text-gray-500">Plus d'infos</p>
+                    <p className="text-xs text-gray-500">Efficacité</p>
                     <p className="text-lg font-bold text-blue-500">200+</p>
                   </div>
                   <CircleChart
@@ -338,7 +338,7 @@ const Accueil = () => {
                   />
                 </div>
                 <div className="flex items-center justify-between mt-auto">
-                  <p className="text-xs text-gray-500">Opportunités</p>
+                  <p className="text-xs text-gray-500">Efficacité globale</p>
                   <button 
                     onClick={() => handleClick(puitsData[selectedPuit].id)}
                     className="bg-[#065882] hover:bg-[#054a6b] text-white text-xs font-bold py-2 px-4 rounded-[2%] w-20 flex items-center justify-center"

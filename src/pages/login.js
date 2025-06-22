@@ -81,7 +81,7 @@ const LoginPage = () => {
 
       if (response.status === 200) {
         if (response.data.role === 'Ingenieur' && response.data.isConnected) {
-          navigate('/Acceuil_ingenieur', { 
+          navigate('/acceuil', { 
             state: { 
               user: response.data,
               authTime: new Date().toISOString()
@@ -89,7 +89,7 @@ const LoginPage = () => {
           });
         } else {
           
-          navigate('/Acceuil', { 
+          navigate('/listpuit', { 
             state: { 
               user: response.data,
               authTime: new Date().toISOString()

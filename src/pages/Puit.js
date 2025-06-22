@@ -3,6 +3,7 @@ import { Doughnut } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement } from 'chart.js';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
+import puitop from '../photos/puitop.png'
 import {
   LineChart,
   Line,
@@ -117,9 +118,9 @@ const Puit = () => {
 
     const formatMontant = (montant) => {
         const num = parseFloat(montant);
-        if (num >= 1000000) return `${(num / 1000000).toFixed(1)} M Dzd`;
-        if (num >= 1000) return `${(num / 1000).toFixed(1)} K Dzd`;
-        return `${num.toFixed(2)} Dzd`;
+        if (num >= 1000000) return `${(num / 1000000).toFixed(1)} M $`;
+        if (num >= 1000) return `${(num / 1000).toFixed(1)} K $`;
+        return `${num.toFixed(2)} $`;
     };
 
     const getDelaiPercentage = () => {
@@ -172,7 +173,7 @@ const Puit = () => {
 
                         <div className="bg-white-100 rounded-lg p-4 flex items-center justify-center border border-gray-300">
                             <img 
-                                src="/images/puit.png" 
+                                src={puitop}
                                 alt="Schéma du puits"
                                 className="max-w-full h-auto"
                             />

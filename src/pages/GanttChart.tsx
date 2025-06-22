@@ -41,20 +41,13 @@ const getCurrentDayPosition = () => {
 
 const phases = [
   {
-    name: "Site Preparation",
+    name: "Drilling RIG",
     startDate: weeks[0].startDate,
     endDate: weeks[1].endDate,
     color: "bg-gray-300",
     position: { start: 0, width: 1.5 }
   },
-  {
-    name: "Drilling", 
-    startDate: weeks[1].startDate,
-    endDate: weeks[3].endDate,
-    color: "bg-blue-400",
-    position: { start: 7, width: 3 }
-  },
-  {
+    {
     name: "Mud Logging",
     startDate: weeks[1].endDate,
     endDate: weeks[3].startDate, 
@@ -68,8 +61,16 @@ const phases = [
     color: "bg-green-400", 
     position: { start: 14, width: 2 }
   },
+    {
+    name: "WATER SUPPLY", 
+    startDate: weeks[1].startDate,
+    endDate: weeks[3].endDate,
+    color: "bg-blue-400",
+    position: { start: 7, width: 3 }
+  },
+
   {
-    name: "Well Testing",
+    name: "TESTING",
     startDate: weeks[3].startDate,
     endDate: weeks[4].endDate,
     color: "bg-purple-400",

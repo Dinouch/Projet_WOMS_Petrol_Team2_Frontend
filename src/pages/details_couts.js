@@ -70,7 +70,7 @@ const DetailCouts = () => {
               changePositive: true
             },
             {
-              title: "Total prevu reste",
+              title: "Total prevu restant",
               value: `${(parseFloat(statsResponse.data.totalPrevuReste) / 1000000).toFixed(2)}M $`,
               change: "31 -7.49% this week",
               changePositive: false
@@ -212,7 +212,7 @@ const DetailCouts = () => {
         <header className="bg-white border-b border-gray-200 rounded-t-lg">
           <div className="flex justify-between items-center px-6 py-3">
             <div className="flex items-center space-x-4">
-              <h1 className="text-[30px] font-bold text-gray-800">Puit de Tindouf #49001</h1>
+              <h1 className="text-[30px] font-bold text-gray-800">Puit A #1</h1>
             </div>
             
             <div className="flex items-center space-x-4">

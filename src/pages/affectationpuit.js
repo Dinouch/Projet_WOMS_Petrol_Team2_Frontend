@@ -4,11 +4,11 @@ import { FiUser, FiSettings, FiMapPin, FiCheck, FiX, FiChevronDown, FiSearch, Fi
 const EngineerAssignmentPage = () => {
   // Données préliminaires des ingénieurs
   const initialEngineers = [
-  { id: 1, name: "Jean Dupont", specialty: "Ingénieur Forage", skills: ["Forage profond", "Géologie structurale", "Sécurité HSE"], experience: "12 ans", assignedWell: null, availability: "Disponible", lastAssignment: "15/03/2023" },
-  { id: 2, name: "Marie Lambert", specialty: "Ingénieur Réservoir", skills: ["Analyse pétrophysique", "Simulation numérique", "Optimisation de production"], experience: "8 ans", assignedWell: 3, availability: "En mission", lastAssignment: "10/05/2023" },
-  { id: 3, name: "Ahmed Khan", specialty: "Ingénieur Production", skills: ["Maintenance industrielle", "Optimisation des puits", "Instrumentation"], experience: "10 ans", assignedWell: 1, availability: "En congé", lastAssignment: "22/01/2023" },
-  { id: 4, name: "Sophie Martin", specialty: "Ingénieur Forage", skills: ["Forage directionnel", "Fluides de forage", "Cimentation"], experience: "5 ans", assignedWell: null, availability: "Disponible", lastAssignment: "05/04/2023" },
-  { id: 5, name: "Lucas Moreau", specialty: "Ingénieur Réservoir", skills: ["Modélisation 3D", "Géophysique", "Gestion de réservoir"], experience: "9 ans", assignedWell: 4, availability: "En mission", lastAssignment: "12/04/2023" },
+  { id: 1, name: "TAIBI Ryad", specialty: "Ingénieur Forage", skills: ["Forage profond", "Géologie structurale", "Sécurité HSE"], experience: "12 ans", assignedWell: null, availability: "Disponible", lastAssignment: "15/03/2023" },
+  { id: 2, name: "Fatima Khelifi", specialty: "Ingénieur Réservoir", skills: ["Analyse pétrophysique", "Simulation numérique", "Optimisation de production"], experience: "8 ans", assignedWell: 3, availability: "En mission", lastAssignment: "10/05/2023" },
+  { id: 3, name: "Mohamed Larbi", specialty: "Ingénieur Production", skills: ["Maintenance industrielle", "Optimisation des puits", "Instrumentation"], experience: "10 ans", assignedWell: 1, availability: "En congé", lastAssignment: "22/01/2023" },
+  { id: 4, name: "Amina Boudjemaa", specialty: "Ingénieur Forage", skills: ["Forage directionnel", "Fluides de forage", "Cimentation"], experience: "5 ans", assignedWell: null, availability: "Disponible", lastAssignment: "05/04/2023" },
+  { id: 5, name: "Karim Meziani", specialty: "Ingénieur Réservoir", skills: ["Modélisation 3D", "Géophysique", "Gestion de réservoir"], experience: "9 ans", assignedWell: 4, availability: "En mission", lastAssignment: "12/04/2023" },
   { id: 6, name: "Chloe Dubois", specialty: "Ingénieur HSE", skills: ["Audit sécurité", "Analyse de risque", "Normes ISO"], experience: "6 ans", assignedWell: null, availability: "Disponible", lastAssignment: "30/03/2023" },
   { id: 7, name: "Mohamed Amine", specialty: "Ingénieur Forage", skills: ["Cimentation", "Forage HPHT", "Sécurité puits"], experience: "11 ans", assignedWell: 5, availability: "En mission", lastAssignment: "01/04/2023" },
   { id: 8, name: "Fatima Zahra", specialty: "Ingénieur Géologue", skills: ["Sédimentologie", "Cartographie", "Échantillonnage"], experience: "4 ans", assignedWell: null, availability: "Disponible", lastAssignment: "14/02/2023" },
